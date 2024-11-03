@@ -7,6 +7,7 @@
 * Windows11
 * CLion
 * MSCV
+* 根据实际情况调整cmake中库路径
 
 ## 推理技术
 
