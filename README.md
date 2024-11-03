@@ -49,7 +49,7 @@
 
   本项目完全模拟ultralytics方法 **ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息**
 
-  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化最大空间为1U<<30
+  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化 最大空间为1U<<30
 * 后续会做全部优化
 
 ## 图片操作提示
