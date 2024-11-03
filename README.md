@@ -13,7 +13,7 @@
 * TensorRT
 * CUDA Graphsc
 
-## 接口
+## Python接口
 
 * buildEngine  arg：onnxFilePath，engineFilePath， half(bool)
 * Runtime arg: shmName(共享空间名)， inputWidth(输入文件宽度，正方形图片)， enginePath
