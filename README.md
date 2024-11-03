@@ -52,6 +52,16 @@
   可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化最大空间为1U<<30
 * 后续会做全部优化
 
-## 注意
+## 图片操作提示
 
 * 图片无需预操作调整，内部使用算子进行自适应调整成模型需要的大小 该项目图片获取地址为共享空间
+
+## 离线需要的DLL文件
+
+* cublas64_11.dll
+* cublasLt64_11.dll
+* cudart64_110.dll
+* cudnn64_8.dll
+* nvinfer_plugin.dll
+* nvinfer.dll
+* nvonnxparser.dll
