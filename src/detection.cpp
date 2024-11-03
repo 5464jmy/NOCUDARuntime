@@ -168,11 +168,9 @@ Runtime::Runtime(std::string shmName, int inputWidth, std::string enginePath):
 shm_name(std::move(shmName)), imageWidth(inputWidth), engine_path(std::move(enginePath)) {
     imageSize = inputWidth * inputWidth * 3;
 
-
     setupTensors();
-    createSharedMemory();
+    // createSharedMemory();
     pointSharedMemory();
-
 
     imageTensor = std::make_shared<Tensor>();
     imageTensor->device(imageSize * sizeof(uint8_t));
