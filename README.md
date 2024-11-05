@@ -38,7 +38,7 @@
 #### 初始化参数：
 
 1. ``RuntimeWithGraph(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics)``;
-   
+
    * shmName：共享空间名(“image”)
    * shapes：图片大小 ([320, 320, 3])
    * enginePath：engine路径
@@ -47,11 +47,12 @@
 2. ``RuntimeWithGraph(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics)``;
 
    * nadarray：numpy数组或cv2读取的图像
-   
    * shapes：图片大小 ([320, 320, 3])
    * enginePath：engine路径
    * ultralytics: 读取文件格式 默认false
-     ``image= cv2.imread("xxx.jpg") detect = Runtime(image, [640,640,3], enginePath, True)``
+   * ```
+     image= cv2.imread("xxx.jpg") detect = Runtime(image, [640,640,3], enginePath, True)
+     ```
 
 #### Python类方法：
 
@@ -87,13 +88,13 @@
     * 怎么获取输出 对实例化进行Numpy``output = np.array(detect, copy=False) #存储结果的buffer``
 
     * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
-        output = np.array(detect, copy=False) #存储结果的buffer       
-        detect.predict()       
-        detect.predict()
+        output = np.array(detect, copy=False) #存储结果的buffer
+    detect.predict()
+    detect.predict()
     * 更换engine后需重新对实例化进行Numpy
         output = np.array(shot, copy=False)
-        detect.setEnginePath("xxx.engine", True)     
-        output = np.array(shot, copy=False) 
+        detect.setEnginePath("xxx.engine", True)
+    output = np.array(shot, copy=False)
 
 #### 使用建议：
 
