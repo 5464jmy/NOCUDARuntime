@@ -83,18 +83,18 @@
 
 #### 可查询属性
 
-    * shapes：传进方法的图片大小
-    * input_dims：模型输入大小
-    * output_dims：模型输出大小
-    * engine_path：engine路径
-    * shm_name：共享空间名
-    * ultralytics：engine格式
+   * shapes：传进方法的图片大小
+   * input_dims：模型输入大小
+   * output_dims：模型输出大小
+   * engine_path：engine路径
+   * shm_name：共享空间名
+   * ultralytics：engine格式
 
 #### 输出
 
-    * 原有TensorRT的输出格式
-    * 怎么获取输出 对实例化进行Numpy``output = np.array(detect, copy=False) #存储结果的buffer``
-    * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
+   * 原有TensorRT的输出格式
+   * 怎么获取输出 对实例化进行Numpy``output = np.array(detect, copy=False) #存储结果的buffer``
+   * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
 
 ```
   output = np.array(detect, copy=False) #存储结果的buffer
@@ -102,7 +102,7 @@
   detect.predict()
 ```
 
-    * 更换engine后需重新对实例化进行Numpy
+   * 更换engine后需重新对实例化进行Numpy
 
 ```
   output = np.array(shot, copy=False)
