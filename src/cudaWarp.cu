@@ -1,4 +1,4 @@
-#include <algorithm>
+﻿#include <algorithm>
 
 #include "cudaWarp.h"
 
@@ -8,8 +8,8 @@ inline __device__ __host__ int iDivUp(int a, int b) {
 }
 
 extern "C" __global__ void gpuBilinearWarpAffine(uint8_t* input, int inputWidth, int inputHeight,
-                                      float* output, int outputWidth, int outputHeight,
-                                      float3 m0, float3 m1) {
+                                                 float* output, int outputWidth, int outputHeight,
+                                                 float3 m0, float3 m1) {
     const int x             = blockDim.x * blockIdx.x + threadIdx.x;
     const int y             = blockDim.y * blockIdx.y + threadIdx.y;
     const int inputLineSize = inputWidth * 3;
@@ -93,8 +93,8 @@ extern "C" void TransformMatrix::transform(float x, float y, float* ox, float* o
 }
 
 extern "C" void cudaWarpAffine(uint8_t* input, uint32_t inputWidth, uint32_t inputHeight,
-                    float* output, uint32_t outputWidth, uint32_t outputHeight,
-                    float3 matrix[2], cudaStream_t stream) {
+                               float* output, uint32_t outputWidth, uint32_t outputHeight,
+                               float3 matrix[2], cudaStream_t stream) {
     // launch kernel
     const dim3 blockDim(8, 8);
     const dim3 gridDim(iDivUp(outputWidth, blockDim.x), iDivUp(outputHeight, blockDim.y));

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(CUDARuntime LANGUAGES CXX CUDA)
+project(NOCUDARuntime LANGUAGES CXX CUDA)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -56,8 +56,8 @@ target_link_libraries(detect_dll PRIVATE ${LIBS})
 
 # Pybind11 module
 add_subdirectory(pybind11)
-pybind11_add_module(detect python/bindings.cpp)
-target_link_libraries(detect PRIVATE detect_dll ${LIBS})
+pybind11_add_module(NOCUDARuntime python/bindings.cpp)
+target_link_libraries(NOCUDARuntime PRIVATE detect_dll ${LIBS})
 
 # Executable
 add_executable(MyExecutable ${SOURCES})
@@ -68,5 +68,5 @@ target_link_libraries(MyExecutable PRIVATE ${LIBS})
 # Apply CUDA architectures to targets
 set_property(TARGET detect_dll PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
 set_property(TARGET detect_dllStatic PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
-set_property(TARGET detect PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
+set_property(TARGET NOCUDARuntime PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
 set_property(TARGET MyExecutable PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")

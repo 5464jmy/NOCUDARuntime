@@ -1,15 +1,19 @@
+﻿
+#include "runtime.h"
+int main(){
+    std::string shmName = "image";
+    std::vector<int> shapes = {320, 320, 3};
+    std::string enginePath = R"(best.engine)";
+
+    Runtime detect(shmName, shapes, enginePath, false);
+//    cv::Mat image = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\8.jpg)");
+//    cv::Mat image1 = cv::Mat(320,320,CV_8UC3, detect.host_ptr);
+//    cv::resize(image, image1, cv::Size(320,320));
 //
-// Created by 27823 on 2024/9/29.
-//#include "detection.h"
-//
-//int main(){
-////    Runtime detect{};
-////    detect.Runtime("image", 320, R"(F:\Pyqt_project\AimbobyUI_3\weights\best copy 4.engine)");
-//    Runtime detect("image", 320, R"(F:\Pyqt_project\AimbobyUI_3\weights\best copy 4.engine)");
 //    detect.predict();
-//
-//    return 0;
-//}
+
+    return 0;
+}
 //
 //#include <iostream>
 //#include <cstring>
@@ -59,19 +63,19 @@
 //
 //    return 0;
 //}
-#include "EngineBuilder.h"
-#include <iostream>
-
-int main() {
-    std::string onnxFilePath = R"(D:\Base\ultralytics-modifiy\runs\pose\train6\weights\best.onnx)";
-    std::string engineFilePath = R"(D:\Base\ultralytics-modifiy\runs\pose\train6\weights\best.engine)";
-
-    try {
-        buildEngine(onnxFilePath, engineFilePath, true);
-        std::cout << "Engine built and written to file successfully." << std::endl;
-    } catch (const std::exception& ex) {
-        std::cerr << "Error: " << ex.what() << std::endl;
-    }
-
-    return 0;
-}
+//#include "enginebuilder.h"
+//#include <iostream>
+//
+//int main() {
+//    std::string onnxFilePath = R"(D:\Base\CS2-pose\runs\pose\train2\weights\best.onnx)";
+//    std::string engineFilePath = R"(best.engine)";
+//
+//    try {
+//        buildEngine(onnxFilePath, engineFilePath, 1, 22, false, false);
+//        std::cout << "Engine built and written to file successfully." << std::endl;
+//    } catch (const std::exception& ex) {
+//        std::cerr << "Error: " << ex.what() << std::endl;
+//    }
+//
+//    return 0;
+//}

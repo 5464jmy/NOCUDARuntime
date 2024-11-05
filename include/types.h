@@ -1,43 +1,36 @@
-//
-// Created by 27823 on 2024/9/28.
-//
-
 #ifndef CUDA_RUN_TYPES_H
 #define CUDA_RUN_TYPES_H
 #pragma once
 
 #include <NvInferRuntime.h>
-
 #include <cstddef>
 #include <cstdint>
 
-
-constexpr int defaultAlignment = 32;
+constexpr int defaultAlignment = 32; // 默认对齐大小
 
 /**
-* @brief Gets the size in bytes of a given data type.
-*
-* @param dataType The data type.
-* @return size_t The size in bytes of the data type.
-*/
+ * @brief 获取指定数据类型的字节大小。
+ *
+ * @param dataType 数据类型。
+ * @return size_t 数据类型所占的字节大小。
+ */
 size_t getDataTypeSize(nvinfer1::DataType dataType);
 
 /**
-* @brief Calculates the volume (total number of elements) of a tensor described
-* by dims.
-*
-* @param dims The dimensions of the tensor.
-* @return int64_t The total number of elements in the tensor.
-*/
-int64_t calculateVolume(nvinfer1::Dims const& dims);
+ * @brief 根据张量的维度计算其体积（总元素个数）。
+ *
+ * @param dims 张量的维度。
+ * @return int64_t 张量的总元素个数。
+ */
+int64_t calculateVolume(const nvinfer1::Dims& dims);
 
 /**
-* @brief Rounds up n to the nearest multiple of align.
-*
-* @param n The number to be rounded up.
-* @param align The alignment value (default is defaultAlignment).
-* @return int64_t The rounded up value.
-*/
+ * @brief 将数字 n 向上取整到 align 的最接近倍数。
+ *
+ * @param n 要取整的数字。
+ * @param align 对齐值（默认是 defaultAlignment）。
+ * @return int64_t 取整后的值。
+ */
 int64_t roundUp(int64_t n, int64_t align = defaultAlignment);
 
 #endif //CUDA_RUN_TYPES_H

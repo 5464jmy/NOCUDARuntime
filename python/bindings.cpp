@@ -1,9 +1,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
-#include "EngineBuilder.h"
-#include "detection.h"
-//#include "person.h"
+#include "enginebuilder.h"
+#include "runtime.h"
 
 
 namespace py = pybind11;
@@ -23,34 +22,52 @@ nvinfer1::Dims32 vector_to_dims(const std::vector<int>& vec) {
     return dims;
 }
 
-PYBIND11_MODULE(detect, m) {
+PYBIND11_MODULE(NOCUDARuntime, m) {
     py::class_<Runtime>(m, "Runtime", py::buffer_protocol())
-            .def_readwrite("shm_name", &Runtime::shm_name, "Shared memory name")
-            .def_readwrite("engine_path", &Runtime::engine_path, "Path to the engine file")
-            .def_readonly("height", &Runtime::height, "Height of the input image")
-            .def_readonly("width", &Runtime::width, "Width of the input image")
-            .def_readonly("imageWidth", &Runtime::imageWidth, "Width of the image")
-
-                    // 自定义 getter 和 setter 来处理 Dims32 类型
-            .def_property("input_dims",
-                          [](const Runtime& self) { return dims_to_vector(self.input_dims); },
-                          [](Runtime& self, const std::vector<int>& dims) {
-                              self.input_dims = vector_to_dims(dims);
-                          })
-
-            .def_property("output_dims",
-                          [](const Runtime& self) { return dims_to_vector(self.output_dims); },
-                          [](Runtime& self, const std::vector<int>& dims) {
-                              self.output_dims = vector_to_dims(dims);
-                          })
-
-            .def(py::init<std::string, int, std::string>(),
-                 py::arg("shmName"), py::arg("inputWidth"), py::arg("enginePath"),
+            .def(py::init<std::string&, std::vector<int>&, std::string&, bool>(),
+                 py::arg("shared memory name"),
+                 py::arg("image [imageWidth, imageHeight]"),
+                 py::arg("engine path"),
+                 py::arg("ultralytics") = false,
                  "Initialize Runtime with shared memory name, input width, and engine path")
-            .def("createSharedMemory", &Runtime::createSharedMemory, "Create shared memory segment")
-            .def("pointSharedMemory", &Runtime::pointSharedMemory, "Point to shared memory segment")
-            .def("setupTensors", &Runtime::setupTensors, "Setup tensors for inference")
-            .def("createGraph", &Runtime::createGraph, "Create the computational graph")
+            .def(py::init([](const py::array_t<uint8_t>& array,
+                    const std::vector<int>& shapes,
+                    std::string& enginePath,
+                    bool ultralytics = false) {
+                     // 获取 numpy 数组的缓冲区信息
+                     py::buffer_info buf = array.request();
+                     // 检查数据维度 (3D array checker)
+                     if (buf.ndim != 3) {
+                         throw std::runtime_error("输入数组必须是三维的");
+                     }
+                     // 调用 Runtime 构造函数
+                     return new Runtime(buf.ptr, shapes, enginePath, ultralytics);
+                 }),
+                 py::arg("array"),
+                 py::arg("shapes"),
+                 py::arg("enginePath"),
+                 py::arg("ultralytics") = false,
+                 "Initialize Runtime with array, shapes, and engine path")
+
+            .def_property("shapes", &Runtime::getShapes, &Runtime::setShapes)
+            .def_property("shm_name", &Runtime::getShmName, &Runtime::setShmName)
+            .def_property("engine_path", &Runtime::getEnginePath, &Runtime::setEnginePath)
+                     // 定义只读属性
+            .def_property_readonly("input_dims",
+                                   [](const Runtime& self) { return dims_to_vector(self.input_dims); },
+                                   "Get input dimensions as a vector of ints")
+
+            .def_property_readonly("output_dims",
+                                   [](const Runtime& self) { return dims_to_vector(self.output_dims); },
+                                   "Get output dimensions as a vector of ints")
+
+            .def("setImage", [](Runtime &self, const py::array_t<uint8_t> &array) {
+                // 获取 numpy 数组的缓冲区信息
+                py::buffer_info buf = array.request();
+                // 将数据指针传递给 Runtime 的 setImagePtr 方法
+                self.setImagePtr(buf.ptr);
+            }, "Set image using numpy array")
+
             .def("predict", &Runtime::predict, "Execute prediction on the input data")
 
                     // 使用 def_buffer 来暴露 output_Tensor 内存
@@ -83,14 +100,14 @@ PYBIND11_MODULE(detect, m) {
                 };
             })
             ;
-//    py::class_<Person>(m, "Person")
-//            .def(py::init<const std::string&, int>(),
-//                 py::arg("name"), py::arg("age"),
-//                 "Initialize Person with name and age")
-//            .def("introduce", &Person::introduce, "Introduce the person");
 
     m.def("buildEngine", &buildEngine,
-          py::arg("onnxFilePath"), py::arg("engineFilePath"), py::arg("half") = false,
+          py::arg("onnxFilePath"),
+          py::arg("engineFilePath"),
+          py::arg("exponent") = 1,
+          py::arg("exponent") = 22,
+          py::arg("half") = false,
+          py::arg("ultralytics") = false,
           "Build a TensorRT engine from an ONNX file");
 }
 

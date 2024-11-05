@@ -1,13 +1,9 @@
-//
-// Created by 27823 on 2024/9/29.
-//
-
 #pragma once
 
 #include <cuda_runtime.h>
-
 #include <iostream>
 
+// 定义用于动态库导出的宏，根据平台条件进行定义。
 #ifdef ENABLE_DEPLOY_BUILDING_DLL
 #if defined(_WIN32)
 #define DEPLOY_DECL __declspec(dllexport)
@@ -20,6 +16,14 @@
 #define DEPLOY_DECL
 #endif
 
+/**
+ * @brief 检查 CUDA API 调用的返回值，并在发生错误时输出错误信息。
+ *
+ * @param code CUDA API 的返回值。
+ * @param file 调用发生的文件名。
+ * @param line 调用发生的行号。
+ * @return 如果没有错误发生则返回 true，发生错误返回 false。
+ */
 inline bool cudaError(cudaError_t code, const char* file, int line) {
     if (code != cudaSuccess) {
         std::cerr << "CUDA Error:\n";
@@ -33,13 +37,11 @@ inline bool cudaError(cudaError_t code, const char* file, int line) {
 }
 
 /**
-* @brief Macro for simplified CUDA error checking.
-*
-* This macro wraps the `cudaError` function, allowing easy and concise checking
-* of CUDA API calls. It evaluates the given CUDA API call `code`, and if it returns
-* an error, the `cudaError` function is called to print error information.
-*
-* @param code The CUDA API call to be executed and checked for errors.
-*/
+ * @brief 简化 CUDA 错误检查的宏。
+ *
+ * 该宏封装了 `cudaError` 函数，提供了一种简洁的方法来检查 CUDA API 调用。
+ * 它评估给定的 CUDA API 调用 `code`，如果返回错误，`cudaError` 函数会被调用以输出错误信息。
+ *
+ * @param code 要执行和检查错误的 CUDA API 调用。
+ */
 #define CUDA(code) cudaError((code), __FILE__, __LINE__)
-
