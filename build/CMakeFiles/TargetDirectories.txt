@@ -1,0 +1,7 @@
+D:/github/NOCUDARuntime/build/CMakeFiles/detect_dll.dir
+D:/github/NOCUDARuntime/build/CMakeFiles/detect_dllStatic.dir
+D:/github/NOCUDARuntime/build/CMakeFiles/NOCUDARuntime.dir
+D:/github/NOCUDARuntime/build/CMakeFiles/MyExecutable.dir
+D:/github/NOCUDARuntime/build/CMakeFiles/ALL_BUILD.dir
+D:/github/NOCUDARuntime/build/CMakeFiles/ZERO_CHECK.dir
+D:/github/NOCUDARuntime/build/pybind11/CMakeFiles/ALL_BUILD.dir

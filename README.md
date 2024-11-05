@@ -101,19 +101,19 @@
 * 怎么获取输出 对实例化进行Numpy ``output = np.array(detect, copy=False) #存储结果的buffer``
 * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
 
-```
-  output = np.array(detect, copy=False) #存储结果的buffer
-  detect.predict()
-  detect.predict()
-```
+   ```
+   output = np.array(detect, copy=False) #存储结果的buffer
+   detect.predict()
+   detect.predict()
+   ```
 
 * 更换engine后需重新对实例化进行Numpy
 
-```
-  output = np.array(shot, copy=False)
-  detect.setEnginePath("xxx.engine", True)
-  output = np.array(shot, copy=False)
-```
+   ```
+   output = np.array(shot, copy=False)
+   detect.setEnginePath("xxx.engine", True)
+   output = np.array(shot, copy=False)
+   ```
 
 #### 使用建议
 
