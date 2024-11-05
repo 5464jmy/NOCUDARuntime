@@ -16,13 +16,24 @@
 
 ## Python接口
 
-* buildEngine  arg：onnxFilePath，engineFilePath， half(bool)
-* Runtime arg: shmName(共享空间名)， inputWidth(输入文件宽度，正方形图片)， enginePath
-* ```
-  detect = Runtime("image", 640, enginePath)
+* buildEnginearg：onnxPath，enginePath， multiplier，exponent，half(bool)，ultralytics
+
+  ```
+  buildEngine(onnxFilePath, engineFilePath, 1, 22, false, false);
   ```
 
-## 输出
+  > multiplier，exponent具体
+  >
+
+  ```
+  config->setMemoryPoolLimit(nvinfer1::MemoryPoolType::kWORKSPACE, (1U << exponent) * multiplier);
+  ```
+* Runtime arg: shmName(共享空间名)， shapes(图片大小)， enginePath， ultralytics(读取文件格式)
+* ```
+  detect = Runtime("image", [640,640,3], enginePath, false)
+  ```
+
+### 输出
 
 * 原有TensorRT的输出格式
 * 怎么启动检测 将图片信息传递进共享空间后
