@@ -19,8 +19,7 @@
 * 在类进行初始化时需要传进一个初始图片大小，后续有调整图片大小可通过类方法重新设置传入方法的图像大小
 * engine格式
   本项目完全模拟ultralytics方法 **ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息**
-  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化
-  最大空间为1U<<30
+  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化 
 * 后续会做全部优化
 
 ## Python接口
@@ -101,19 +100,18 @@
 * 怎么获取输出 对实例化进行Numpy ``output = np.array(detect, copy=False) #存储结果的buffer``
 * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
 
-   ```
-   output = np.array(detect, copy=False) #存储结果的buffer
-   detect.predict()
-   detect.predict()
-   ```
-
+  ```
+  output = np.array(detect, copy=False) #存储结果的buffer
+  detect.predict()
+  detect.predict()
+  ```
 * 更换engine后需重新对实例化进行Numpy
 
-   ```
-   output = np.array(shot, copy=False)
-   detect.setEnginePath("xxx.engine", True)
-   output = np.array(shot, copy=False)
-   ```
+  ```
+  output = np.array(shot, copy=False)
+  detect.setEnginePath("xxx.engine", True)
+  output = np.array(shot, copy=False)
+  ```
 
 #### 使用建议
 
