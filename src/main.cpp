@@ -8,7 +8,7 @@ int main(){
     cv::Mat image1 = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\8.jpg)");
     cv::resize(image1, image1, cv::Size(320,320));
 
-    Runtime detect(image1.data, shapes, enginePath, false);
+    RuntimeWithGraph detect(image1.data, shapes, enginePath, false);
     auto* output_ptr = static_cast<float*>(detect.output_Tensor.host());  // 获取指针
     detect.predict();
 

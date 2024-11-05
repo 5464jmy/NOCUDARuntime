@@ -23,7 +23,7 @@ nvinfer1::Dims32 vector_to_dims(const std::vector<int>& vec) {
 }
 
 PYBIND11_MODULE(NOCUDARuntime, m) {
-    py::class_<Runtime>(m, "Runtime", py::buffer_protocol())
+    py::class_<RuntimeWithGraph>(m, "RuntimeWithGraph", py::buffer_protocol())
             .def(py::init<std::string&, std::vector<int>&, std::string&, bool>(),
                  py::arg("shared memory name"),
                  py::arg("image [imageWidth, imageHeight]"),
@@ -41,7 +41,7 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                          throw std::runtime_error("输入数组必须是三维的");
                      }
                      // 调用 Runtime 构造函数
-                     return new Runtime(buf.ptr, shapes, enginePath, ultralytics);
+                     return new RuntimeWithGraph(buf.ptr, shapes, enginePath, ultralytics);
                  }),
                  py::arg("array"),
                  py::arg("shapes"),
@@ -49,28 +49,28 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                  py::arg("ultralytics") = true,
                  "Initialize Runtime with array, shapes, and engine path")
 
-            .def_property("shapes", &Runtime::getShapes, &Runtime::setShapes)
-            .def_property("shm_name", &Runtime::getShmName, &Runtime::setShmName)
-            .def_property_readonly("engine_path", &Runtime::getEnginePath, "")
+            .def_property("shapes", &RuntimeWithGraph::getShapes, &RuntimeWithGraph::setShapes)
+            .def_property("shm_name", &RuntimeWithGraph::getShmName, &RuntimeWithGraph::setShmName)
+            .def_property_readonly("engine_path", &RuntimeWithGraph::getEnginePath, "")
                      // 定义只读属性
             .def_property_readonly("input_dims",
-                                   [](const Runtime& self) { return dims_to_vector(self.input_dims); },
+                                   [](const RuntimeWithGraph& self) { return dims_to_vector(self.input_dims); },
                                    "Get input dimensions as a vector of ints")
 
             .def_property_readonly("output_dims",
-                                   [](const Runtime& self) { return dims_to_vector(self.output_dims); },
+                                   [](const RuntimeWithGraph& self) { return dims_to_vector(self.output_dims); },
                                    "Get output dimensions as a vector of ints")
 
-            .def("predict", &Runtime::predict, "Execute prediction on the input data")
-            .def("setImage", [](Runtime &self, const py::array_t<uint8_t> &array) {
+            .def("predict", &RuntimeWithGraph::predict, "Execute prediction on the input data")
+            .def("setImage", [](RuntimeWithGraph &self, const py::array_t<uint8_t> &array) {
                 // 获取 numpy 数组的缓冲区信息
                 py::buffer_info buf = array.request();
                 // 将数据指针传递给 Runtime 的 setImagePtr 方法
                 self.setImagePtr(buf.ptr);
             }, "Set image using numpy array")
-            .def("setEnginePath", &Runtime::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
+            .def("setEnginePath", &RuntimeWithGraph::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
             // 使用 def_buffer 来暴露 output_Tensor 内存
-            .def_buffer([](Runtime& self) -> py::buffer_info {
+            .def_buffer([](RuntimeWithGraph& self) -> py::buffer_info {
                 auto* output_ptr = static_cast<float*>(self.output_Tensor.host());  // 获取指针
                 if (!output_ptr) {
                     throw std::runtime_error("Output tensor host memory is null.");
@@ -99,7 +99,7 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                 };
             })
 
-            .def_readonly("ultralytics", &Runtime::ultralytics, "engine style")
+            .def_readonly("ultralytics", &RuntimeWithGraph::ultralytics, "engine style")
             ;
 
     m.def("buildEngine", &buildEngine,

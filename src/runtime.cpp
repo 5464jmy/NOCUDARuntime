@@ -41,7 +41,7 @@ vector<char> loadFile(const string& filePath, bool ultralytics) {
 }
 
 // 带有共享内存名的构造函数
-Runtime::Runtime(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics) {
+RuntimeWithGraph::RuntimeWithGraph(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics) {
     // 初始化参数
     this->ultralytics = ultralytics;
     imageWidth = shapes[0];
@@ -68,7 +68,7 @@ Runtime::Runtime(string& shmName, const vector<int>& shapes, string& enginePath,
 }
 
 // 带有图像指针的构造函数
-Runtime::Runtime(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics) {
+RuntimeWithGraph::RuntimeWithGraph(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics) {
     // 初始化参数
     this->ultralytics = ultralytics;
     imageWidth = shapes[0];
@@ -94,7 +94,7 @@ Runtime::Runtime(void* image_ptr, const vector<int>& shapes, string& enginePath,
 }
 
 // 设置运行时的张量
-void Runtime::InitTensors() {
+void RuntimeWithGraph::InitTensors() {
     // 加载引擎文件到字符向量
     auto data = loadFile(engine_path, ultralytics);
     engineCtx = make_shared<EngineContext>();
@@ -129,7 +129,7 @@ void Runtime::InitTensors() {
 }
 
 // 创建CUDA图形执行计划
-void Runtime::createGraph() {
+void RuntimeWithGraph::createGraph() {
     // 开始捕获CUDA流中的操作
     cudaStreamBeginCapture(inferStream, cudaStreamCaptureModeGlobal);
 
@@ -154,7 +154,7 @@ void Runtime::createGraph() {
 }
 
 // 创建共享内存
-void Runtime::createSharedMemory() {
+void RuntimeWithGraph::createSharedMemory() {
     // 创建共享内存映射文件
     hMapFile = CreateFileMappingA(
             INVALID_HANDLE_VALUE, // 使用系统分页文件
@@ -171,7 +171,7 @@ void Runtime::createSharedMemory() {
 }
 
 // 连接到共享内存
-void Runtime::pointSharedMemory() {
+void RuntimeWithGraph::pointSharedMemory() {
     // 打开命名文件映射对象
     hMapFile = OpenFileMapping(
             FILE_MAP_ALL_ACCESS, // 可读写
@@ -199,7 +199,7 @@ void Runtime::pointSharedMemory() {
 }
 
 // 析构函数
-Runtime::~Runtime() {
+RuntimeWithGraph::~RuntimeWithGraph() {
     // 销毁图执行实例
     if (inferGraphExec != nullptr) {
         cudaGraphExecDestroy(inferGraphExec);
@@ -232,19 +232,19 @@ Runtime::~Runtime() {
 }
 
 // 推理方法
-void Runtime::predict() {
+void RuntimeWithGraph::predict() {
     // 执行推理
     cudaGraphLaunch(inferGraphExec, inferStream);
     cudaStreamSynchronize(inferStream);
 }
 
 // 获取共享内存名称
-string Runtime::getShmName() {
+string RuntimeWithGraph::getShmName() {
     return shm_name;
 }
 
 // 设置共享内存名称
-void Runtime::setShmName(string &shmName) {
+void RuntimeWithGraph::setShmName(string &shmName) {
     // 释放现有资源
     if (hMapFile != nullptr) {
         UnmapViewOfFile(host_ptr);
@@ -266,7 +266,7 @@ void Runtime::setShmName(string &shmName) {
 }
 
 // 设置图像指针
-void Runtime::setImagePtr(void* image_ptr) {
+void RuntimeWithGraph::setImagePtr(void* image_ptr) {
     // 释放现有资源
     if (hMapFile != nullptr) {
         UnmapViewOfFile(host_ptr);
@@ -287,7 +287,7 @@ void Runtime::setImagePtr(void* image_ptr) {
 }
 
 // 设置引擎路径
-void Runtime::setEnginePath(string &enginePath, bool ultralytics_in) {
+void RuntimeWithGraph::setEnginePath(string &enginePath, bool ultralytics_in) {
     // 释放现有资源
     if (inferGraphExec != nullptr) {
         cudaGraphExecDestroy(inferGraphExec);
@@ -313,12 +313,12 @@ void Runtime::setEnginePath(string &enginePath, bool ultralytics_in) {
 }
 
 // 获取引擎路径
-string Runtime::getEnginePath() {
+string RuntimeWithGraph::getEnginePath() {
     return engine_path;
 }
 
 // 设置形状参数
-void Runtime::setShapes(const vector<int> &shapes) {
+void RuntimeWithGraph::setShapes(const vector<int> &shapes) {
     imageTensor.reset();  // 重置图像张量
 
     imageWidth = shapes[0];
@@ -333,6 +333,6 @@ void Runtime::setShapes(const vector<int> &shapes) {
 }
 
 // 获取形状参数
-vector<int> Runtime::getShapes() {
+vector<int> RuntimeWithGraph::getShapes() {
     return vector<int>{imageWidth, imageHeight, imageChannels};
 }

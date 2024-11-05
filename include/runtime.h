@@ -38,13 +38,13 @@
 using namespace std;
 
 // 使用API宏确保在共享库中导出类
-class API Runtime {
+class API RuntimeWithGraph {
 public:
     // 构造函数，接受共享内存名称、输入宽度和引擎路径
-    Runtime(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics);
+    RuntimeWithGraph(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics);
 
     // 构造函数，接受图像指针、输入宽度和引擎路径
-    Runtime(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics);
+    RuntimeWithGraph(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics);
 
     // 成员函数的声明
     void setImagePtr(void* image_ptr);
@@ -65,7 +65,7 @@ public:
 
     void predict();  // 执行预测
 
-    ~Runtime();  // 析构函数
+    ~RuntimeWithGraph();  // 析构函数
 
     // 公有成员变量
     string shm_name{};
@@ -97,7 +97,7 @@ private:
     int64_t output_bytes{}; // 输出张量的字节数
 
     std::shared_ptr<Tensor> imageTensor{}; // 图像张量的智能指针
-    int imageSize{};  // 图像大小
+    int64_t imageSize{};  // 图像大小
 
     TransformMatrix transforms{};  // 用于图像变换的矩阵
 };
