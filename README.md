@@ -43,14 +43,16 @@
    * shapes：图片大小 ([320, 320, 3])
    * enginePath：engine路径
    * ultralytics: 读取文件格式 默认false
-     ``detect = Runtime("image", [640,640,3], "xxx.engine", True)``
+     ```
+     detect = Runtime("image", [640,640,3], "xxx.engine", True)
+     ```
 2. ``RuntimeWithGraph(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics)``;
 
    * nadarray：numpy数组或cv2读取的图像
    * shapes：图片大小 ([320, 320, 3])
    * enginePath：engine路径
    * ultralytics: 读取文件格式 默认false
-   * ```
+     ```
      image= cv2.imread("xxx.jpg") 
      detect = Runtime(image, [640,640,3], enginePath, True)
      ```
@@ -58,15 +60,26 @@
 #### Python类方法：
 
 1. 启动检测
-   ``detect.predict()``
+    ```
+    detect.predict()
+    ```
 2. 修改共享内存名
-   ``detect.shm_name = 'xxx'``
+    ```
+    detect.shm_name = "'xxx'"
+    ```
 3. 修改获取图像的地址(图片要是传进去的shapes大小)
-   ``image = cv2.imread("xxx.jpg")  detect.setImage(image)``
+    ```
+    image = cv2.imread("xxx.jpg")  
+    detect.setImage(image)
+    ```
 4. 更换engine
-   ``detect.setEnginePath("xxx.engine", True)``
+    ```
+    detect.setEnginePath("xxx.engine", True)
+    ```
 5. 修改输入的图片尺寸
-   ``detect.shapes = [320, 320, 3]``
+    ```
+    detect.shapes = [320, 320, 3]
+    ```
 
 #### 可查询属性：
 
@@ -89,13 +102,18 @@
     * 怎么获取输出 对实例化进行Numpy``output = np.array(detect, copy=False) #存储结果的buffer``
 
     * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
-        output = np.array(detect, copy=False) #存储结果的buffer
-    detect.predict()
-    detect.predict()
+  ```
+  output = np.array(detect, copy=False) #存储结果的buffer
+  detect.predict()
+  detect.predict()
+  ```
     * 更换engine后需重新对实例化进行Numpy
-        output = np.array(shot, copy=False)
-        detect.setEnginePath("xxx.engine", True)
-    output = np.array(shot, copy=False)
+
+  ```
+  output = np.array(shot, copy=False)
+  detect.setEnginePath("xxx.engine", True)
+  output = np.array(shot, copy=False)
+  ```
 
 #### 使用建议：
 
