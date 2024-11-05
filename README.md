@@ -15,14 +15,19 @@
 ## 注意
 
 * 该模块类方法均会调用核函数对图片进行**双线性缩放**成模型需要的尺寸
-* 在传进图片前均需要先预设好传入方法的图像大小，而后可自动将传进去的图片缩放成模型需要的尺寸，且缩放后图片位于中心。
+* 在传进图片前均需要先预设好传入方法的图像大小，而后可自动将传进去的图片缩放成模型需要的尺寸，且缩放后图片**位于中心**。
 * 在类进行初始化时需要传进一个初始图片大小，后续有调整图片大小可通过类方法重新设置传入方法的图像大小
+* engine格式
+  本项目完全模拟ultralytics方法 **ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息**
+  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化
+  最大空间为1U<<30
+* 后续会做全部优化
 
 ## Python接口
 
 ### buildEngine
 
-#### 参数：
+#### 参数
 
 * onnxPath：提供的onnx路径
 * enginePath：生成engine路径
@@ -83,18 +88,18 @@
 
 #### 可查询属性
 
-   * shapes：传进方法的图片大小
-   * input_dims：模型输入大小
-   * output_dims：模型输出大小
-   * engine_path：engine路径
-   * shm_name：共享空间名
-   * ultralytics：engine格式
+* shapes：传进方法的图片大小
+* input_dims：模型输入大小
+* output_dims：模型输出大小
+* engine_path：engine路径
+* shm_name：共享空间名
+* ultralytics：engine格式
 
 #### 输出
 
-   * 原有TensorRT的输出格式
-   * 怎么获取输出 对实例化进行Numpy``output = np.array(detect, copy=False) #存储结果的buffer``
-   * Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
+* 原有TensorRT的输出格式
+* 怎么获取输出 对实例化进行Numpy ``output = np.array(detect, copy=False) #存储结果的buffer``
+* Numpy一次后永久有效可重复从output获取结果，不需要重复np.array(detect, copy=False)(除非更换engine）
 
 ```
   output = np.array(detect, copy=False) #存储结果的buffer
@@ -102,7 +107,7 @@
   detect.predict()
 ```
 
-   * 更换engine后需重新对实例化进行Numpy
+* 更换engine后需重新对实例化进行Numpy
 
 ```
   output = np.array(shot, copy=False)
@@ -114,16 +119,6 @@
 
     * 批量一个尺寸的图片或者截屏 录屏检测
     * 需要将图片村放到统一的地址才能读取
-
-## 注意
-
-* engine格式
-
-  本项目完全模拟ultralytics方法 **ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息**
-
-  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化
-  最大空间为1U<<30
-* 后续会做全部优化
 
 ## 图片操作提示
 
