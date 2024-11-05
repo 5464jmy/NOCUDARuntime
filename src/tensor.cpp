@@ -38,10 +38,12 @@ Tensor::~Tensor() {
     // 如果主机指针不为空，释放主机内存
     if (hostPtr != nullptr) {
         CUDA(cudaFreeHost(hostPtr));
+//        hostBytes = 0;
     }
     // 如果设备指针不为空，释放设备内存
     if (devicePtr != nullptr) {
         CUDA(cudaFree(devicePtr));
+//        deviceBytes = 0;
     }
 }
 

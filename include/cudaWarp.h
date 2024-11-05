@@ -11,8 +11,6 @@
  */
 extern "C" struct TransformMatrix {
     float3 matrix[2];   // 用于仿射变换的 2x3 矩阵。
-    int    lastWidth;   // 上次处理的源图像的宽度。
-    int    lastHeight;  // 上次处理的源图像的高度。
 
     /**
      * @brief 根据源图像和目标图像尺寸的变化更新变换矩阵。

@@ -68,9 +68,6 @@ extern "C" __global__ void gpuBilinearWarpAffine(uint8_t* input, int inputWidth,
 }
 
 extern "C" void TransformMatrix::update(int fromWidth, int fromHeight, int toWidth, int toHeight) {
-    if (fromWidth == lastWidth && fromHeight == lastHeight) return;
-    lastWidth  = fromWidth;
-    lastHeight = fromHeight;
 
     float scale  = std::min(static_cast<float>(toWidth) / fromWidth, static_cast<float>(toHeight) / fromHeight);
     float offset = 0.5f * scale - 0.5f;

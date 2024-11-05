@@ -33,7 +33,7 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
             .def(py::init([](const py::array_t<uint8_t>& array,
                     const std::vector<int>& shapes,
                     std::string& enginePath,
-                    bool ultralytics = false) {
+                    bool ultralytics) {
                      // 获取 numpy 数组的缓冲区信息
                      py::buffer_info buf = array.request();
                      // 检查数据维度 (3D array checker)
@@ -46,12 +46,12 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                  py::arg("array"),
                  py::arg("shapes"),
                  py::arg("enginePath"),
-                 py::arg("ultralytics") = false,
+                 py::arg("ultralytics") = true,
                  "Initialize Runtime with array, shapes, and engine path")
 
             .def_property("shapes", &Runtime::getShapes, &Runtime::setShapes)
             .def_property("shm_name", &Runtime::getShmName, &Runtime::setShmName)
-            .def_property("engine_path", &Runtime::getEnginePath, &Runtime::setEnginePath)
+            .def_property_readonly("engine_path", &Runtime::getEnginePath, "")
                      // 定义只读属性
             .def_property_readonly("input_dims",
                                    [](const Runtime& self) { return dims_to_vector(self.input_dims); },
@@ -61,19 +61,18 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                                    [](const Runtime& self) { return dims_to_vector(self.output_dims); },
                                    "Get output dimensions as a vector of ints")
 
+            .def("predict", &Runtime::predict, "Execute prediction on the input data")
             .def("setImage", [](Runtime &self, const py::array_t<uint8_t> &array) {
                 // 获取 numpy 数组的缓冲区信息
                 py::buffer_info buf = array.request();
                 // 将数据指针传递给 Runtime 的 setImagePtr 方法
                 self.setImagePtr(buf.ptr);
             }, "Set image using numpy array")
-
-            .def("predict", &Runtime::predict, "Execute prediction on the input data")
-
-                    // 使用 def_buffer 来暴露 output_Tensor 内存
+            .def("setEnginePath", &Runtime::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
+            // 使用 def_buffer 来暴露 output_Tensor 内存
             .def_buffer([](Runtime& self) -> py::buffer_info {
-                auto* ptr = static_cast<float*>(self.output_Tensor.host());  // 获取指针
-                if (!ptr) {
+                auto* output_ptr = static_cast<float*>(self.output_Tensor.host());  // 获取指针
+                if (!output_ptr) {
                     throw std::runtime_error("Output tensor host memory is null.");
                 }
 
@@ -91,7 +90,7 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
 
                 // 使用大括号初始化 buffer_info
                 return py::buffer_info{
-                        ptr,                             // 指向内存的指针
+                        output_ptr,                      // 指向内存的指针
                         sizeof(float),                   // 元素的大小
                         py::format_descriptor<float>::format(),  // 数据类型
                         self.output_dims.nbDims,                    // 维度数量
@@ -99,6 +98,8 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                         strides                          // 步长
                 };
             })
+
+            .def_readonly("ultralytics", &Runtime::ultralytics, "engine style")
             ;
 
     m.def("buildEngine", &buildEngine,
