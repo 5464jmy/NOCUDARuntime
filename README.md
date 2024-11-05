@@ -51,7 +51,8 @@
    * enginePath：engine路径
    * ultralytics: 读取文件格式 默认false
    * ```
-     image= cv2.imread("xxx.jpg") detect = Runtime(image, [640,640,3], enginePath, True)
+     image= cv2.imread("xxx.jpg") 
+     detect = Runtime(image, [640,640,3], enginePath, True)
      ```
 
 #### Python类方法：
