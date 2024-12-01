@@ -25,7 +25,9 @@
 ## Python接口
 
 ### buildEngine
-
+``void buildEngine(const std::string& onnxFilePath, const std::string& engineFilePath,
+                 int multiplier = 1, int exponent = 22,
+                 bool half = false, bool ultralytics = false)``
 #### 参数
 
 * onnxPath：提供的onnx路径
