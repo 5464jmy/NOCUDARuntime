@@ -27,6 +27,12 @@
 ### buildEngine
 
 #### 参数
+``buildEngine(const std::string& onnxFilePath,
+                 const std::string& engineFilePath,
+                 int multiplier = 1,
+                 int exponent = 22,
+                 bool half = false,
+                 bool ultralytics = false)``;
 
 * onnxPath：提供的onnx路径
 * enginePath：生成engine路径
@@ -34,7 +40,9 @@
   ``config->setMemoryPoolLimit(nvinfer1::MemoryPoolType::kWORKSPACE, (1U << exponent) * multiplier)``;
 * half：半精度 默认false
 * ultralytics：ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息 默认false
-
+```
+buildEngine("weights/best.onnx", "weights/best.engine", 1, 22, False, True)
+```
 ### RuntimeWithGraph
 
 #### 初始化参数
