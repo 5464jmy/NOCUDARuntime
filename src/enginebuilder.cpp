@@ -10,64 +10,99 @@ void buildEngine(const std::string& onnxFilePath,
                  int multiplier = 1,
                  int exponent = 22,
                  bool half = false,
-                 bool ultralytics = false){
-    // 创建 TensorRT 的日志记录器以跟踪输出信息
+                 bool ultralytics = false) {
+    // 创建日志记录器
     logger logger;
 
     // 创建 TensorRT Builder
-    nvinfer1::IBuilder* builder = nvinfer1::createInferBuilder(logger);
-    nvinfer1::INetworkDefinition* network = builder->createNetworkV2(1U << (unsigned int) nvinfer1::NetworkDefinitionCreationFlag::kEXPLICIT_BATCH);
-    auto config = builder->createBuilderConfig();
-    auto parser = nvonnxparser::createParser(*network, logger);
+    auto builder = nvinfer1::createInferBuilder(logger);
+    if (!builder) throw std::runtime_error("Failed to create TensorRT builder");
 
-    // 解析 ONNX 模型
-    if (!parser->parseFromFile(onnxFilePath.c_str(), static_cast<int>(nvinfer1::ILogger::Severity::kINFO))) {
-        throw std::runtime_error("Failed to parse ONNX file");  // 如果解析失败，抛出异常
+    // 创建网络定义
+    auto network = builder->createNetworkV2(1U << (unsigned int)nvinfer1::NetworkDefinitionCreationFlag::kEXPLICIT_BATCH);
+    if (!network) {
+        builder->destroy();
+        throw std::runtime_error("Failed to create network definition");
     }
 
-    // 设置内存池限制，以1GB为最大工作空间
+    // 创建配置
+    auto config = builder->createBuilderConfig();
+    if (!config) {
+        network->destroy();
+        builder->destroy();
+        throw std::runtime_error("Failed to create builder config");
+    }
+
+    // 创建 ONNX 解析器
+    auto parser = nvonnxparser::createParser(*network, logger);
+    if (!parser) {
+        config->destroy();
+        network->destroy();
+        builder->destroy();
+        throw std::runtime_error("Failed to create ONNX parser");
+    }
+
+    // 解析 ONNX 文件
+    if (!parser->parseFromFile(onnxFilePath.c_str(), static_cast<int>(nvinfer1::ILogger::Severity::kINFO))) {
+        parser->destroy();
+        config->destroy();
+        network->destroy();
+        builder->destroy();
+        throw std::runtime_error("Failed to parse ONNX file");
+    }
+
+    // 设置内存限制
     config->setMemoryPoolLimit(nvinfer1::MemoryPoolType::kWORKSPACE, (1U << exponent) * multiplier);
 
-    // 如果硬件支持 FP16 并且用户希望使用半精度，则启用 FP16 模式
+    // 检查是否支持 FP16，并根据需求启用
     if (builder->platformHasFastFp16() && half) {
         config->setFlag(nvinfer1::BuilderFlag::kFP16);
     }
 
-    // 序列化网络到 IHostMemory
-    nvinfer1::IHostMemory* plan = builder->buildSerializedNetwork(*network, *config);
+    // 构建序列化网络
+    auto plan = builder->buildSerializedNetwork(*network, *config);
     if (!plan) {
-        throw std::runtime_error("Failed to build serialized network");  // 如果序列化失败，抛出异常
+        parser->destroy();
+        config->destroy();
+        network->destroy();
+        builder->destroy();
+        throw std::runtime_error("Failed to build serialized network");
     }
 
-    // 打开文件流以二进制方式写入引擎数据
+    // 打开文件流写入引擎文件
     std::ofstream file(engineFilePath, std::ios::binary);
     if (!file) {
-        throw std::runtime_error("Failed to open engine file for writing");  // 如果文件打开失败，抛出异常
+        plan->destroy();
+        parser->destroy();
+        config->destroy();
+        network->destroy();
+        builder->destroy();
+        throw std::runtime_error("Failed to open engine file for writing");
     }
 
-    if (ultralytics){
-        // 使用 nlohmann::json 创建 JSON 对象
-        // 创建一个 JSON 对象以存储模型的元数据
-        nlohmann::json metadata;
-        metadata["author"] = "Ultralytics";
-        metadata["license"] = "AGPL-3.0 https://ultralytics.com/license";
-        metadata["stride"] = 32;
-        metadata["task"] = "pose";
-        metadata["batch"] = 1;
-        metadata["imgsz"] = {640, 640};
-        metadata["names"] = {{"0", "CT"}, {"1", "T"}};
-        metadata["kpt_shape"] = {1, 3};
-        // 写入元数据到文件
-        std::string metadataStr = metadata.dump(4);  // 将 JSON 元数据格式化为字符串
-        size_t metaSize = metadataStr.size();
+    // 如果 ultralytics 模式启用，写入元数据
+    if (ultralytics) {
+        nlohmann::json metadata = {
+                {"author", "Ultralytics"},
+                {"license", "AGPL-3.0 https://ultralytics.com/license"},
+                {"stride", 32},
+                {"task", "pose"},
+                {"batch", 1},
+                {"imgsz", {640, 640}},
+                {"names", {{"0", "CT"}, {"1", "T"}}},
+                {"kpt_shape", {1, 3}}
+        };
+
+        std::string metadataStr = metadata.dump(4);  // 格式化 JSON
+        int32_t metaSize = static_cast<int32_t>(metadataStr.size());// 确保 metaSize 是 4 字节有符号整数
         file.write(reinterpret_cast<const char*>(&metaSize), sizeof(metaSize));  // 写入元数据大小
-        file.write(metadataStr.c_str(), metaSize);  // 写入元数据内容
+        file.write(metadataStr.data(), metaSize);  // 写入元数据内容
     }
 
-    // 写入序列化的引擎数据
+    // 写入序列化引擎数据
     file.write(reinterpret_cast<const char*>(plan->data()), plan->size());
 
-    // 清理资源，释放所有动态分配的对象
+    // 释放所有资源
     plan->destroy();
     parser->destroy();
     network->destroy();

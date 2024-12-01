@@ -19,23 +19,27 @@
 * 在类进行初始化时需要传进一个初始图片大小，后续有调整图片大小可通过类方法重新设置传入方法的图像大小
 * engine格式
   本项目完全模拟ultralytics方法 **ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息**
-  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化 
+  可以使用buildEngine接口对onnx转化 其格式也是ultralytics转化
 * 后续会做全部优化
 
 ## Python接口
 
 ### buildEngine
 
+``buildEngine(const std::string& onnxFilePath, const std::string& engineFilePath, int multiplier = 1, int exponent = 22, bool half = false, bool ultralytics = false)``
+
 #### 参数
 
 * onnxPath：提供的onnx路径
 * enginePath：生成engine路径
 * multiplier，exponent：
-  ```
-  config->setMemoryPoolLimit(nvinfer1::MemoryPoolType::kWORKSPACE, (1U << exponent) * multiplier);
-  ```
+  ``config->setMemoryPoolLimit(nvinfer1::MemoryPoolType::kWORKSPACE, (1U << exponent) * multiplier)``;
 * half：半精度 默认false
 * ultralytics：ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息 默认false
+
+```
+buildEngine("weights/best.onnx", "weights/best.engine", 1, 22, True, True)
+```
 
 ### RuntimeWithGraph
 

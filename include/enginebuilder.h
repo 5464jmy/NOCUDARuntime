@@ -23,6 +23,7 @@
  */
 extern API void buildEngine(const std::string& onnxFilePath,
                             const std::string& engineFilePath,
-                            int multiplier, int exponent, bool half, bool ultralytics);
+                            int multiplier, int exponent,
+                            bool half, bool ultralytics);
 
 #endif // ENGINE_BUILDER_H

@@ -1,35 +1,35 @@
 ﻿
-#include "runtime.h"
-int main(){
-    std::string shmName = "image";
-    std::vector<int> shapes = {320, 320, 3};
-    std::string enginePath = R"(best.engine)";
-
-    cv::Mat image1 = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\8.jpg)");
-    cv::resize(image1, image1, cv::Size(320,320));
-
-    RuntimeWithGraph detect(image1.data, shapes, enginePath, false);
-    auto* output_ptr = static_cast<float*>(detect.output_Tensor.host());  // 获取指针
-    detect.predict();
-
-    enginePath = R"(E:\Pyqt_project\AimbobyUI_4\weights\best.engine)";
-    detect.setEnginePath(enginePath, true);
-    detect.predict();
-
-    cv::Mat image2 = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\7.jpg)");
-    cv::resize(image2, image2, cv::Size(320,320));
-    detect.setImagePtr(image2.data);
-    detect.predict();
-
-
-//    cv::Mat image = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\8.jpg)");
-//    cv::Mat image1 = cv::Mat(320,320,CV_8UC3, detect.host_ptr);
-//    cv::resize(image, image1, cv::Size(320,320));
+//#include "runtime.h"
+//int main(){
+//    std::string shmName = "image";
+//    std::vector<int> shapes = {320, 320, 3};
+//    std::string enginePath = R"(best.engine)";
 //
+//    cv::Mat image1 = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\8.jpg)");
+//    cv::resize(image1, image1, cv::Size(320,320));
+//
+//    RuntimeWithGraph detect(image1.data, shapes, enginePath, false);
+//    auto* output_ptr = static_cast<float*>(detect.output_Tensor.host());  // 获取指针
 //    detect.predict();
-
-    return 0;
-}
+//
+//    enginePath = R"(E:\Pyqt_project\AimbobyUI_4\weights\best.engine)";
+//    detect.setEnginePath(enginePath, true);
+//    detect.predict();
+//
+//    cv::Mat image2 = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\7.jpg)");
+//    cv::resize(image2, image2, cv::Size(320,320));
+//    detect.setImagePtr(image2.data);
+//    detect.predict();
+//
+//
+////    cv::Mat image = cv::imread(R"(E:\Pyqt_project\AimbobyUI_4\app\resource\images\8.jpg)");
+////    cv::Mat image1 = cv::Mat(320,320,CV_8UC3, detect.host_ptr);
+////    cv::resize(image, image1, cv::Size(320,320));
+////
+////    detect.predict();
+//
+//    return 0;
+//}
 ////
 ////#include <iostream>
 ////#include <cstring>
@@ -81,19 +81,19 @@ int main(){
 ////}
 //
 //
-//#include "enginebuilder.h"
-//#include <iostream>
-//
-//int main() {
-//    std::string onnxFilePath = R"(D:\Base\CS2-pose\runs\pose\train2\weights\best.onnx)";
-//    std::string engineFilePath = R"(best.engine)";
-//
-//    try {
-//        buildEngine(onnxFilePath, engineFilePath, 1, 22, false, false);
-//        std::cout << "Engine built and written to file successfully." << std::endl;
-//    } catch (const std::exception& ex) {
-//        std::cerr << "Error: " << ex.what() << std::endl;
-//    }
-//
-//    return 0;
-//}
+#include "enginebuilder.h"
+#include <iostream>
+
+int main() {
+    std::string onnxFilePath = R"(E:\Pyqt_project\AimbobyUI_4\weights\best.onnx)";
+    std::string engineFilePath = R"(best.engine)";
+
+    try {
+        buildEngine(onnxFilePath, engineFilePath, 1, 22, false, true);
+        std::cout << "Engine built and written to file successfully." << std::endl;
+    } catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << std::endl;
+    }
+
+    return 0;
+}
