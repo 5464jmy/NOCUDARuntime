@@ -25,7 +25,7 @@
 ## Python接口
 
 ### buildEngine
-``void buildEngine(const std::string& onnxFilePath, const std::string& engineFilePath,
+``buildEngine(const std::string& onnxFilePath, const std::string& engineFilePath,
                  int multiplier = 1, int exponent = 22,
                  bool half = false, bool ultralytics = false)``
 #### 参数
@@ -38,6 +38,9 @@
   ```
 * half：半精度 默认false
 * ultralytics：ultralytics下转成的模型前缀有4 + 196个字节长度为文件描述信息 默认false
+  ```
+  buildEngine("weights/best.onnx", "weights/best.engine", 1, 22, True, True)
+  ```
 
 ### RuntimeWithGraph
 
