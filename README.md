@@ -29,10 +29,8 @@
 #### 参数
 ``buildEngine(const std::string& onnxFilePath,
                  const std::string& engineFilePath,
-                 int multiplier = 1,
-                 int exponent = 22,
-                 bool half = false,
-                 bool ultralytics = false)``;
+                 int multiplier, int exponent,
+                 bool half, bool ultralytics)``;
 
 * onnxPath：提供的onnx路径
 * enginePath：生成engine路径
