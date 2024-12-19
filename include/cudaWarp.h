@@ -34,6 +34,45 @@ extern "C" struct TransformMatrix {
 };
 
 /**
+ * @brief 表示用于仿射变换的 2x3 转换矩阵的结构体。
+ */
+extern "C" struct WarpAffine {
+    dim3 blockDim{};   // 用于仿射变换的 2x3 矩阵。
+    dim3 gridDim{};   // 用于仿射变换的 2x3 矩阵。
+
+    uint8_t* input;
+    uint32_t inputWidth, inputHeight;
+    float* output;
+    uint32_t outputWidth, outputHeight;
+
+    TransformMatrix* transforms{nullptr};
+    cudaStream_t stream{nullptr};
+
+    WarpAffine(void *input, uint32_t imageWidth, uint32_t imageHeight,
+               void *output, uint32_t toWidth, uint32_t toHeight,
+               cudaStream_t stream);
+
+
+//    void update(uint32_t outputWidth, uint32_t outputHeight);
+
+    /**
+     * @brief 使用 CUDA 应用仿射变换。
+     *
+     * @param input 指向输入图像数据的指针。
+     * @param inputWidth 输入图像的宽度。
+     * @param inputHeight 输入图像的高度。
+     * @param output 指向输出图像数据的指针。
+     * @param outputWidth 输出图像的宽度。
+     * @param outputHeight 输出图像的高度。
+     * @param matrix 仿射变换矩阵。
+     * @param stream 用于异步执行的 CUDA 流（可选）。
+     */
+
+    void cudaWarpAffine();
+};
+
+
+/**
  * @brief 使用 CUDA 应用仿射变换。
  *
  * @param input 指向输入图像数据的指针。
@@ -47,6 +86,7 @@ extern "C" struct TransformMatrix {
  */
 extern "C" void cudaWarpAffine(
         uint8_t* input, uint32_t inputWidth, uint32_t inputHeight,
-        float* output, uint32_t outputWidth, uint32_t outputHeight, float3 matrix[2], cudaStream_t stream);
+        float* output, uint32_t outputWidth, uint32_t outputHeight,
+        float3 matrix[2], cudaStream_t stream);
 
 #endif //CUDAWARP_H

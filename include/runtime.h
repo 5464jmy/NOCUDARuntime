@@ -26,7 +26,7 @@
 #include <NvInferRuntime.h>
 #include <NvInferPlugin.h>
 #include <cuda_runtime.h>
-#include <opencv2//opencv.hpp>
+//#include <opencv2//opencv.hpp>
 #include <device_launch_parameters.h>
 
 // 自定义头文件
@@ -56,8 +56,6 @@ public:
     vector<int> getShapes();
 
     void InitTensors();  // 初始化张量
-
-    void createSharedMemory();  // 创建共享内存
 
     void pointSharedMemory();  // 指向共享内存
 
@@ -99,7 +97,7 @@ private:
     std::shared_ptr<Tensor> imageTensor{}; // 图像张量的智能指针
     int64_t imageSize{};  // 图像大小
 
-    TransformMatrix transforms{};  // 用于图像变换的矩阵
+    WarpAffine* warpAffine{nullptr};
 };
 
 #endif // RUNTIME_H

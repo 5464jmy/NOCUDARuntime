@@ -1,0 +1,18 @@
+# ninja log v5
+0	11	0	clean	e9ab220c3d3c5e5
+33	1011	7558757317475212	CMakeFiles/detect_dll.dir/D_/element/cuda/samples/common/src/multithreading.cpp.obj	c062b76969e42590
+1	1019	7558757317719975	CMakeFiles/detect_dll.dir/src/core.cpp.obj	1bd33bf7738a278c
+29	1167	7558757319066658	CMakeFiles/detect_dll.dir/D_/element/cuda/samples/common/src/helper_multiprocess.cpp.obj	cecfa0c263249b7
+1020	1293	7558757320308008	CMakeFiles/detect_dll.dir/src/types.cpp.obj	60cd96b357a13c01
+20	1487	7558757322395373	CMakeFiles/detect_dll.dir/D_/element/cuda/samples/common/src/rendercheck_d3d9.cpp.obj	7374b82c750cdb94
+38	1569	7558757323230780	CMakeFiles/detect_dll.dir/D_/element/cuda/samples/common/src/rendercheck_d3d10.cpp.obj	70fff19d4f48bf8d
+24	1607	7558757323601861	CMakeFiles/detect_dll.dir/D_/element/cuda/samples/common/src/rendercheck_d3d11.cpp.obj	acaafe7e3a46521c
+47	1829	7558757325831815	CMakeFiles/detect_dll.dir/src/main.cpp.obj	f6bef6d23cb169f6
+1012	1848	7558757326043734	CMakeFiles/detect_dll.dir/src/tensor.cpp.obj	47ead8f385629cda
+52	1960	7558757327124394	CMakeFiles/detect_dll.dir/src/runtime.cpp.obj	6f8ed68081e14669
+43	2217	7558757329708175	CMakeFiles/detect_dll.dir/src/enginebuilder.cpp.obj	95c218de74766f98
+1167	5274	7558757360220631	CMakeFiles/NOCUDARuntime.dir/python/bindings.cpp.obj	b5c5f07d445210e7
+6	6851	7558757375875400	CMakeFiles/detect_dll.dir/src/cudaWarp.cu.obj	7ea56ddd72f51521
+6852	7334	7558757380605325	detect_dll.dll	f9fef56dad5645a7
+6852	7334	7558757380605325	detect_dll.lib	f9fef56dad5645a7
+7334	7725	7558757384510832	NOCUDARuntime.cp310-win_amd64.pyd	7f237e353f993e82

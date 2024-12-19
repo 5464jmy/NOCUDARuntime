@@ -59,8 +59,9 @@ RuntimeWithGraph::RuntimeWithGraph(string& shmName, const vector<int>& shapes, s
 //    createSharedMemory();
     pointSharedMemory(); // 指向共享内存
     InitTensors(); // 初始化张量
-    transforms.update(imageWidth, imageHeight, width, height);
     cudaStreamCreate(&inferStream);  // 创建CUDA流
+    warpAffine = new WarpAffine(imageTensor->device(), imageWidth, imageHeight,
+                                input_Tensor.device(), width, height, inferStream);
     if (!engineCtx->mContext->enqueueV3(inferStream)) {
         throw runtime_error("Failed to enqueueV3 before graph creation");
     }
@@ -84,13 +85,17 @@ RuntimeWithGraph::RuntimeWithGraph(void* image_ptr, const vector<int>& shapes, s
     host_ptr = image_ptr;
 
     InitTensors(); // 初始化张量
-    transforms.update(imageWidth, imageHeight, width, height);
     cudaStreamCreate(&inferStream);  // 创建CUDA流
+    warpAffine = new WarpAffine(imageTensor->device(), imageWidth, imageHeight,
+                                input_Tensor.device(), width, height,
+                                inferStream);
+
     if (!engineCtx->mContext->enqueueV3(inferStream)) {
         throw runtime_error("Failed to enqueueV3 before graph creation");
     }
     cudaStreamSynchronize(inferStream);
     createGraph(); // 创建CUDA图
+
 }
 
 // 设置运行时的张量
@@ -117,6 +122,7 @@ void RuntimeWithGraph::InitTensors() {
             height = input_dims.d[2];
             width = input_dims.d[3];
             input_bytes = calculateVolume(input_dims) * typesz;
+//            input_Tensor.host(input_bytes);
             engineCtx->mContext->setTensorAddress(name, input_Tensor.device(input_bytes));
         } else {
             // 如果是输出张量，获取输出张量的维度
@@ -130,16 +136,18 @@ void RuntimeWithGraph::InitTensors() {
 
 // 创建CUDA图形执行计划
 void RuntimeWithGraph::createGraph() {
+//    warpAffine = cudaWarpAffine;
     // 开始捕获CUDA流中的操作
     cudaStreamBeginCapture(inferStream, cudaStreamCaptureModeGlobal);
 
     // 将图像数据从主机复制到设备
     cudaMemcpyAsync(imageTensor->device(), host_ptr, imageSize * sizeof(uint8_t), cudaMemcpyHostToDevice, inferStream);
 
-    // 执行图像扭曲变换
-    cudaWarpAffine(static_cast<uint8_t*>(imageTensor->device()), imageWidth, imageWidth,
-                   static_cast<float*>(input_Tensor.device()), width, height,
-                   transforms.matrix, inferStream);
+//    // 执行图像扭曲变换
+//    cudaWarpAffine(static_cast<uint8_t*>(imageTensor->device()), imageWidth, imageWidth,
+//                   static_cast<float*>(input_Tensor.device()), width, height,
+//                   transforms.matrix, inferStream);
+    warpAffine->cudaWarpAffine();
 
     // 将推理操作入队
     if (!engineCtx->mContext->enqueueV3(inferStream)) {
@@ -236,6 +244,11 @@ void RuntimeWithGraph::predict() {
     // 执行推理
     cudaGraphLaunch(inferGraphExec, inferStream);
     cudaStreamSynchronize(inferStream);
+
+//    cudaMemcpyAsync(input_Tensor.host(), input_Tensor.device(), input_bytes, cudaMemcpyHostToDevice, inferStream);
+//    cv::Mat image(width, height, CV_32FC3, input_Tensor.host());
+//    cv::imshow("image", image);
+//    cv::waitKey(0);
 }
 
 // 获取共享内存名称
@@ -303,7 +316,7 @@ void RuntimeWithGraph::setEnginePath(string &enginePath, bool ultralytics_in) {
     engine_path = enginePath;  // 更新引擎路径
 
     InitTensors();  // 重新初始化张量
-    transforms.update(imageWidth, imageHeight, width, height);
+    warpAffine->transforms->update(imageWidth, imageHeight, width, height);
     if (!engineCtx->mContext->enqueueV3(inferStream)) {
         throw runtime_error("Failed to enqueueV3 before graph creation");
     }
@@ -328,7 +341,7 @@ void RuntimeWithGraph::setShapes(const vector<int> &shapes) {
 
     imageTensor = make_shared<Tensor>();
     imageTensor->device(imageSize * sizeof(uint8_t));
-    transforms.update(imageWidth, imageHeight, width, height);
+    warpAffine->transforms->update(imageWidth, imageHeight, width, height);
     createGraph();  // 创建CUDA图
 }
 

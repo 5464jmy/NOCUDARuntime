@@ -1,3 +1,5 @@
+
+
 cmake_minimum_required(VERSION 3.12)
 project(NOCUDARuntime LANGUAGES CXX CUDA)
 
@@ -26,14 +28,15 @@ set(TENSORRT_LIBRARY_DIR "D:/element/TensorRT-8.6.1.6/lib")
 include_directories(${TENSORRT_INCLUDE_DIR})
 link_directories(${TENSORRT_LIBRARY_DIR})
 
-# OpenCV
-set(OpenCV_DIR "D:/element/opencv/build")
-find_package(OpenCV REQUIRED)
 
 # Include directories
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-include_directories(${INCLUDE_DIR} ${CUDA_INCLUDE_DIRS} ${TENSORRT_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} "D:/element/cuda/samples/common/inc")
+include_directories(${INCLUDE_DIR}
+        ${CUDA_INCLUDE_DIRS}
+        ${TENSORRT_INCLUDE_DIR}
+#        ${OpenCV_INCLUDE_DIRS}
+        "D:/element/cuda/samples/common/inc")
 
 # Find source files
 file(GLOB_RECURSE SOURCES
@@ -43,7 +46,7 @@ file(GLOB_RECURSE SOURCES
 )
 
 # Libraries
-set(LIBS ${CUDA_LIBRARIES} ${OpenCV_LIBS}
+set(LIBS ${CUDA_LIBRARIES}
         d3d12 dxgi d3dcompiler dxguid nvinfer nvonnxparser nvinfer_plugin
 )
 
