@@ -62,7 +62,7 @@ Although inconvenient, one workaround is to encapsulate the immutable types in
 a custom type that does allow modifications.
 
 An other alternative involves binding a small wrapper lambda function that
-returns a tuple with all output arguments (see the remainder of the
+returns a tuple with all outputPtr arguments (see the remainder of the
 documentation for examples on binding lambda functions). An example:
 
 .. code-block:: cpp

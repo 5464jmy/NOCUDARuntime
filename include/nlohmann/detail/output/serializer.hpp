@@ -60,7 +60,7 @@ class serializer
 
   public:
     /*!
-    @param[in] s  output stream to serialize to
+    @param[in] s  outputPtr stream to serialize to
     @param[in] ichar  indentation character to use
     @param[in] error_handler_  how to react on decoding errors
     */
@@ -97,9 +97,9 @@ class serializer
       byte array
 
     @param[in] val               value to serialize
-    @param[in] pretty_print      whether the output shall be pretty-printed
+    @param[in] pretty_print      whether the outputPtr shall be pretty-printed
     @param[in] ensure_ascii If @a ensure_ascii is true, all non-ASCII characters
-    in the output are escaped with `\uXXXX` sequences, and the result consists
+    in the outputPtr are escaped with `\uXXXX` sequences, and the result consists
     of ASCII characters only.
     @param[in] indent_step       the indent level
     @param[in] current_indent    the current indent level (only used internally)
@@ -380,7 +380,7 @@ class serializer
     Escape a string by replacing certain special characters by a sequence of an
     escape character (backslash) and another character and other control
     characters by a sequence of "\u" followed by a four-digit hex
-    representation. The escaped string is written to output stream @a o.
+    representation. The escaped string is written to outputPtr stream @a o.
 
     @param[in] s  the string to escape
     @param[in] ensure_ascii  whether to escape non-ASCII characters with
@@ -638,7 +638,7 @@ class serializer
     /*!
     @brief count digits
 
-    Count the number of decimal (base 10) digits for an input unsigned integer.
+    Count the number of decimal (base 10) digits for an inputPtr unsigned integer.
 
     @param[in] x  unsigned integer number to count its digits
     @return    number of decimal digits
@@ -699,7 +699,7 @@ class serializer
     /*!
     @brief dump an integer
 
-    Dump a given integer to output stream @a o. Works internally with
+    Dump a given integer to outputPtr stream @a o. Works internally with
     @a number_buffer.
 
     @param[in] x  integer number (signed or unsigned) to dump
@@ -791,7 +791,7 @@ class serializer
     /*!
     @brief dump a floating-point number
 
-    Dump a given floating-point number to output stream @a o. Works internally
+    Dump a given floating-point number to outputPtr stream @a o. Works internally
     with @a number_buffer.
 
     @param[in] x  floating-point number to dump
@@ -959,7 +959,7 @@ class serializer
     }
 
   private:
-    /// the output of the serializer
+    /// the outputPtr of the serializer
     output_adapter_t<char> o = nullptr;
 
     /// a (hopefully) large enough character buffer

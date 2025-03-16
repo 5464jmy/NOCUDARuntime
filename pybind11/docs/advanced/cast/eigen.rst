@@ -13,7 +13,7 @@ Pass-by-value
 =============
 
 When binding a function with ordinary Eigen dense object arguments (for
-example, ``Eigen::MatrixXd``), pybind11 will accept any input value that is
+example, ``Eigen::MatrixXd``), pybind11 will accept any inputPtr value that is
 already (or convertible to) a ``numpy.ndarray`` with dimensions compatible with
 the Eigen type, copy its values into a temporary Eigen variable of the
 appropriate type, then call the function with this temporary variable.

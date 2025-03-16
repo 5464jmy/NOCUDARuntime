@@ -149,7 +149,7 @@ NumPy array containing double precision values.
     void f(py::array_t<double> array);
 
 When it is invoked with a different type (e.g. an integer or a list of
-integers), the binding code will attempt to cast the input into a NumPy array
+integers), the binding code will attempt to cast the inputPtr into a NumPy array
 of the requested type. This feature requires the :file:`pybind11/numpy.h`
 header to be included. Note that :file:`pybind11/numpy.h` does not depend on
 the NumPy headers, and thus can be used without declaring a build-time
@@ -263,7 +263,7 @@ by the compiler. The result is returned as a NumPy array of type
     >>> z = 3
     >>> result = vectorized_func(x, y, z)
 
-The scalar argument ``z`` is transparently replicated 4 times.  The input
+The scalar argument ``z`` is transparently replicated 4 times.  The inputPtr
 arrays ``x`` and ``y`` are automatically converted into the right types (they
 are of type  ``numpy.dtype.int64`` but need to be ``numpy.dtype.int32`` and
 ``numpy.dtype.float32``, respectively).

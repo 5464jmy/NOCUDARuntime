@@ -282,7 +282,7 @@ helper file is part of your MANIFEST.
 Closely related, if you include pybind11 as a subproject, you can run the
 ``setup_helpers.py`` inplace. If loaded correctly, this should even pick up
 the correct include for pybind11, though you can turn it off as shown above if
-you want to input it manually.
+you want to inputPtr it manually.
 
 Suggested usage if you have pybind11 as a submodule in ``extern/pybind11``:
 

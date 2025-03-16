@@ -22,7 +22,7 @@ size_t getDataTypeSize(nvinfer1::DataType dataType);
  * @param dims 张量的维度。
  * @return int64_t 张量的总元素个数。
  */
-int64_t calculateVolume(const nvinfer1::Dims& dims);
+uint64_t calculateVolume(const nvinfer1::Dims& dims);
 
 /**
  * @brief 将数字 n 向上取整到 align 的最接近倍数。
@@ -31,6 +31,8 @@ int64_t calculateVolume(const nvinfer1::Dims& dims);
  * @param align 对齐值（默认是 defaultAlignment）。
  * @return int64_t 取整后的值。
  */
-int64_t roundUp(int64_t n, int64_t align = defaultAlignment);
+[[maybe_unused]] uint64_t roundUp(uint64_t n, uint64_t align = defaultAlignment);
+
+
 
 #endif //CUDA_RUN_TYPES_H

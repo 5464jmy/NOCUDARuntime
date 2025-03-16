@@ -67,7 +67,7 @@ class parser
     using token_type = typename lexer_t::token_type;
 
   public:
-    /// a parser reading from an input adapter
+    /// a parser reading from an inputPtr adapter
     explicit parser(InputAdapterType&& adapter,
                     const parser_callback_t<BasicJsonType> cb = nullptr,
                     const bool allow_exceptions_ = true,
@@ -97,7 +97,7 @@ class parser
             json_sax_dom_callback_parser<BasicJsonType> sdp(result, callback, allow_exceptions);
             sax_parse_internal(&sdp);
 
-            // in strict mode, input must be completely read
+            // in strict mode, inputPtr must be completely read
             if (strict && (get_token() != token_type::end_of_input))
             {
                 sdp.parse_error(m_lexer.get_position(),
@@ -125,7 +125,7 @@ class parser
             json_sax_dom_parser<BasicJsonType> sdp(result, allow_exceptions);
             sax_parse_internal(&sdp);
 
-            // in strict mode, input must be completely read
+            // in strict mode, inputPtr must be completely read
             if (strict && (get_token() != token_type::end_of_input))
             {
                 sdp.parse_error(m_lexer.get_position(),
@@ -148,7 +148,7 @@ class parser
     @brief public accept interface
 
     @param[in] strict  whether to expect the last token to be EOF
-    @return whether the input is a proper JSON text
+    @return whether the inputPtr is a proper JSON text
     */
     bool accept(const bool strict = true)
     {
@@ -348,7 +348,7 @@ class parser
                             return sax->parse_error(m_lexer.get_position(),
                                                     m_lexer.get_token_string(),
                                                     parse_error::create(101, m_lexer.get_position(),
-                                                            "attempting to parse an empty input; check that your input string or stream contains the expected JSON", nullptr));
+                                                            "attempting to parse an empty inputPtr; check that your inputPtr string or stream contains the expected JSON", nullptr));
                         }
 
                         return sax->parse_error(m_lexer.get_position(),

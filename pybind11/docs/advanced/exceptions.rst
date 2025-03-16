@@ -69,7 +69,7 @@ Python. For that, catch :class:`pybind11::error_already_set`. See :ref:`below
 <handling_python_exceptions_cpp>` for further details.
 
 There is also a special exception :class:`cast_error` that is thrown by
-:func:`handle::call` when the input arguments cannot be converted to Python
+:func:`handle::call` when the inputPtr arguments cannot be converted to Python
 objects.
 
 Registering custom translators

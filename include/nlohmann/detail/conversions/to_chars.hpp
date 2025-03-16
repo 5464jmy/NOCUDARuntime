@@ -180,7 +180,7 @@ struct boundaries
 };
 
 /*!
-Compute the (normalized) diyfp representing the input number 'value' and its
+Compute the (normalized) diyfp representing the inputPtr number 'value' and its
 boundaries.
 
 @pre value must be finite and positive
@@ -229,7 +229,7 @@ boundaries compute_boundaries(FloatType value)
     //      v+ = v + 2^e
     //
     // Let m- = (v- + v) / 2 and m+ = (v + v+) / 2. All real numbers _strictly_
-    // between m- and m+ round to v, regardless of how the input rounding
+    // between m- and m+ round to v, regardless of how the inputPtr rounding
     // algorithm breaks ties.
     //
     //      ---+-------------+-------------+-------------+-------------+---  (A)
@@ -806,7 +806,7 @@ inline void grisu2_digit_gen(char* buffer, int& length, int& decimal_exponent,
 
     // By construction this algorithm generates the shortest possible decimal
     // number (Loitsch, Theorem 6.2) which rounds back to w.
-    // For an input number of precision p, at least
+    // For an inputPtr number of precision p, at least
     //
     //      N = 1 + ceil(p * log_10(2))
     //
@@ -864,8 +864,8 @@ inline void grisu2(char* buf, int& len, int& decimal_exponent,
     //  --------+---[---------------(---+---)---------------]---+--------
     //          w-  M-                  w                   M+  w+
     //
-    // Now any number in [M-, M+] (bounds included) will round to w when input,
-    // regardless of how the input rounding algorithm breaks ties.
+    // Now any number in [M-, M+] (bounds included) will round to w when inputPtr,
+    // regardless of how the inputPtr rounding algorithm breaks ties.
     //
     // And digit_gen generates the shortest possible such number in [M-, M+].
     // Note that this does not mean that Grisu2 always generates the shortest
@@ -1055,7 +1055,7 @@ inline char* format_buffer(char* buf, int len, int decimal_exponent,
 The format of the resulting decimal representation is similar to printf's %g
 format. Returns an iterator pointing past-the-end of the decimal representation.
 
-@note The input number must be finite, i.e. NaN's and Inf's are not supported.
+@note The inputPtr number must be finite, i.e. NaN's and Inf's are not supported.
 @note The buffer must be large enough.
 @note The result is NOT null-terminated.
 */

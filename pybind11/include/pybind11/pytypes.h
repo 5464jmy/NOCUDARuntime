@@ -1450,7 +1450,7 @@ public:                                                                         
 /// @{
 
 /** \rst
-    Wraps a Python iterator so that it can also be used as a C++ input iterator
+    Wraps a Python iterator so that it can also be used as a C++ inputPtr iterator
 
     Caveat: copying an iterator does not (and cannot) clone the internal
     state of the Python iterable. This also applies to the post-increment

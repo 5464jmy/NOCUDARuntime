@@ -21,9 +21,8 @@
  * @param engineFilePath 指定输出的 TensorRT 引擎文件路径。
  * @param half 指定是否使用半精度（FP16）模式。默认为 false。
  */
-extern API void buildEngine(const std::string& onnxFilePath,
-                            const std::string& engineFilePath,
-                            int multiplier, int exponent,
-                            bool half, bool ultralytics);
+extern API void buildEngine(const std::string& onnxFilePath, const std::string& engineFilePath,
+                            int multiplier=1, int exponent=22,
+                            bool half=false, bool dynamic=false, bool ultralytics=false);
 
 #endif // ENGINE_BUILDER_H

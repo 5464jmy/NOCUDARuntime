@@ -4,7 +4,7 @@
 // Tensor 类的实现
 
 // 用于在主机（CPU）上重新分配内存
-void Tensor::reallocHost(int64_t bytes) {
+void Tensor::reallocHost(uint64_t bytes) {
     // 如果当前分配容量小于所需字节数，则重新分配内存
     if (hostCap < bytes) {
         // 释放当前的主机内存（假设 CUDA 是一个用于检查 CUDA API 结果的宏）
@@ -19,7 +19,7 @@ void Tensor::reallocHost(int64_t bytes) {
 }
 
 // 用于在设备（GPU）上重新分配内存
-void Tensor::reallocDevice(int64_t bytes) {
+void Tensor::reallocDevice(uint64_t bytes) {
     // 如果当前设备内存容量小于所需字节数，则重新分配内存
     if (deviceCap < bytes) {
         // 释放当前设备内存
@@ -48,14 +48,14 @@ Tensor::~Tensor() {
 }
 
 // 获取指定大小的主机内存指针
-void* Tensor::host(int64_t size) {
+void* Tensor::host(uint64_t size) {
     // 调用 reallocHost 以确保分配足够的内存
     reallocHost(size);
     return hostPtr;
 }
 
 // 获取指定大小的设备内存指针
-void* Tensor::device(int64_t size) {
+void* Tensor::device(uint64_t size) {
     // 调用 reallocDevice 以确保分配足够的内存
     reallocDevice(size);
     return devicePtr;

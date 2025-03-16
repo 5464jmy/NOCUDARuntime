@@ -1798,7 +1798,7 @@ broadcast(const std::array<buffer_info, N> &buffers, ssize_t &ndim, std::vector<
     shape.clear();
     shape.resize((size_t) ndim, 1);
 
-    // Figure out the output size, and make sure all input arrays conform (i.e. are either size 1
+    // Figure out the outputPtr size, and make sure all inputPtr arrays conform (i.e. are either size 1
     // or the full size).
     for (size_t i = 0; i < N; ++i) {
         auto res_iter = shape.rbegin();
@@ -1808,7 +1808,7 @@ broadcast(const std::array<buffer_info, N> &buffers, ssize_t &ndim, std::vector<
             const auto &dim_size_in = *shape_iter;
             auto &dim_size_out = *res_iter;
 
-            // Each input dimension can either be 1 or `n`, but `n` values must match across
+            // Each inputPtr dimension can either be 1 or `n`, but `n` values must match across
             // buffers
             if (dim_size_out == 1) {
                 dim_size_out = dim_size_in;
@@ -1992,7 +1992,7 @@ private:
         std::array<buffer_info, NVectorized> buffers{
             {reinterpret_cast<array *>(params[VIndex])->request()...}};
 
-        /* Determine dimensions parameters of output array */
+        /* Determine dimensions parameters of outputPtr array */
         ssize_t nd = 0;
         std::vector<ssize_t> shape(0);
         auto trivial = broadcast(buffers, nd, shape);

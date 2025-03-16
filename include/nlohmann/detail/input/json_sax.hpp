@@ -23,9 +23,9 @@ NLOHMANN_JSON_NAMESPACE_BEGIN
 @brief SAX interface
 
 This class describes the SAX interface used by @ref nlohmann::json::sax_parse.
-Each function is called in different situations while the input is parsed. The
+Each function is called in different situations while the inputPtr is parsed. The
 boolean return value informs the parser whether to continue processing the
-input.
+inputPtr.
 */
 template<typename BasicJsonType>
 struct json_sax
@@ -125,7 +125,7 @@ struct json_sax
 
     /*!
     @brief a parse error occurred
-    @param[in] position    the position in the input where the error occurs
+    @param[in] position    the position in the inputPtr where the error occurs
     @param[in] last_token  the last read token
     @param[in] ex          an exception object describing the error
     @return whether parsing should proceed (must return false)

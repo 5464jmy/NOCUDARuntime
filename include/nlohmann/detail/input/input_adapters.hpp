@@ -31,11 +31,11 @@ NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
-/// the supported input formats
+/// the supported inputPtr formats
 enum class input_format_t { json, cbor, msgpack, ubjson, bson, bjdata };
 
 ////////////////////
-// input adapters //
+// inputPtr adapters //
 ////////////////////
 
 #ifndef JSON_NO_IO
@@ -74,12 +74,12 @@ class file_input_adapter
 
 /*!
 Input adapter for a (caching) istream. Ignores a UFT Byte Order Mark at
-beginning of input. Does not support changing the underlying std::streambuf
-in mid-input. Maintains underlying std::istream and std::streambuf to support
-subsequent use of standard std::istream operations to process any input
-characters following those used in parsing the JSON input.  Clears the
-std::istream flags; any input errors (e.g., EOF) will be detected by the first
-subsequent call for input from the std::istream.
+beginning of inputPtr. Does not support changing the underlying std::streambuf
+in mid-inputPtr. Maintains underlying std::istream and std::streambuf to support
+subsequent use of standard std::istream operations to process any inputPtr
+characters following those used in parsing the JSON inputPtr.  Clears the
+std::istream flags; any inputPtr errors (e.g., EOF) will be detected by the first
+subsequent call for inputPtr from the std::istream.
 */
 class input_stream_adapter
 {
@@ -127,7 +127,7 @@ class input_stream_adapter
     }
 
   private:
-    /// the associated input stream
+    /// the associated inputPtr stream
     std::istream* is = nullptr;
     std::streambuf* sb = nullptr;
 };
@@ -293,7 +293,7 @@ struct wide_string_input_helper<BaseInputAdapter, 2>
     }
 };
 
-// Wraps another input adapter to convert wide character types into individual bytes.
+// Wraps another inputPtr adapter to convert wide character types into individual bytes.
 template<typename BaseInputAdapter, typename WideCharType>
 class wide_string_input_adapter
 {
@@ -375,7 +375,7 @@ struct iterator_input_adapter_factory<IteratorType, enable_if_t<is_iterator_of_m
     }
 };
 
-// General purpose iterator-based input
+// General purpose iterator-based inputPtr
 template<typename IteratorType>
 typename iterator_input_adapter_factory<IteratorType>::adapter_type input_adapter(IteratorType first, IteratorType last)
 {

@@ -2,7 +2,8 @@
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include "enginebuilder.h"
-#include "runtime.h"
+#include "Runtime.h"
+#include "tensor.h"
 
 
 namespace py = pybind11;
@@ -23,63 +24,35 @@ nvinfer1::Dims32 vector_to_dims(const std::vector<int>& vec) {
 }
 
 PYBIND11_MODULE(NOCUDARuntime, m) {
-    py::class_<RuntimeWithGraph>(m, "RuntimeWithGraph", py::buffer_protocol())
-            .def(py::init<std::string&, std::vector<int>&, std::string&, bool>(),
-                 py::arg("shared memory name"),
-                 py::arg("image [imageWidth, imageHeight]"),
+    py::class_<Base>(m, "Base", py::buffer_protocol())
+            .def(py::init<std::string&, bool, bool, uint32_t>(),
                  py::arg("engine path"),
                  py::arg("ultralytics") = false,
-                 "Initialize Runtime with shared memory name, input width, and engine path")
-            .def(py::init([](const py::array_t<uint8_t>& array,
-                    const std::vector<int>& shapes,
-                    std::string& enginePath,
-                    bool ultralytics) {
-                     // 获取 numpy 数组的缓冲区信息
-                     py::buffer_info buf = array.request();
-                     // 检查数据维度 (3D array checker)
-                     if (buf.ndim != 3) {
-                         throw std::runtime_error("输入数组必须是三维的");
-                     }
-                     // 调用 Runtime 构造函数
-                     return new RuntimeWithGraph(buf.ptr, shapes, enginePath, ultralytics);
-                 }),
-                 py::arg("array"),
-                 py::arg("shapes"),
-                 py::arg("enginePath"),
-                 py::arg("ultralytics") = true,
-                 "Initialize Runtime with array, shapes, and engine path")
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Base with shared memory name, inputPtr width, and engine path")
 
-            .def_property("shapes", &RuntimeWithGraph::getShapes, &RuntimeWithGraph::setShapes)
-            .def_property("shm_name", &RuntimeWithGraph::getShmName, &RuntimeWithGraph::setShmName)
-            .def_property_readonly("engine_path", &RuntimeWithGraph::getEnginePath, "")
-                     // 定义只读属性
-            .def_property_readonly("input_dims",
-                                   [](const RuntimeWithGraph& self) { return dims_to_vector(self.input_dims); },
-                                   "Get input dimensions as a vector of ints")
+            .def_property_readonly("input_dims", [](const Base& self) { return dims_to_vector(self.inputDims); },
+                                   "Get inputPtr dimensions as a vector of ints")
 
-            .def_property_readonly("output_dims",
-                                   [](const RuntimeWithGraph& self) { return dims_to_vector(self.output_dims); },
-                                   "Get output dimensions as a vector of ints")
-
-            .def("predict", &RuntimeWithGraph::predict, "Execute prediction on the input data")
-            .def("setImage", [](RuntimeWithGraph &self, const py::array_t<uint8_t> &array) {
-                // 获取 numpy 数组的缓冲区信息
+            .def_property_readonly("output_dims", [](const Base& self) { return dims_to_vector(self.outputDims); },
+                                   "Get outputPtr dimensions as a vector of ints")
+            .def_readonly("ultralytics", &Base::ultralytics, "engine style")
+            .def_readonly("engine", &Base::enginePath, "engine style")
+            .def("set_engine", &Base::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
+            .def("predict", [](Base& self, const py::array_t<float>& array){
                 py::buffer_info buf = array.request();
-                // 将数据指针传递给 Runtime 的 setImagePtr 方法
-                self.setImagePtr(buf.ptr);
-            }, "Set image using numpy array")
-            .def("setEnginePath", &RuntimeWithGraph::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
-            // 使用 def_buffer 来暴露 output_Tensor 内存
-            .def_buffer([](RuntimeWithGraph& self) -> py::buffer_info {
-                auto* output_ptr = static_cast<float*>(self.output_Tensor.host());  // 获取指针
+                self.predict((float *)(buf.ptr));
+                }, "Execute prediction on the inputPtr data")
+            // 使用 def_buffer 来暴露 outputTensor 内存
+            .def_buffer([](Base& self) -> py::buffer_info {
+                auto* output_ptr = (float*)(self.outputTensor.host());  // 获取指针
                 if (!output_ptr) {
                     throw std::runtime_error("Output tensor host memory is null.");
                 }
 
                 // 获取输出的维度
-                std::vector<size_t> shape(self.output_dims.d,
-                                          self.output_dims.d + self.output_dims.nbDims);
-
+                std::vector<size_t> shape(self.outputDims.d, self.outputDims.d + self.outputDims.nbDims);
                 // 每个维度的步长
                 std::vector<size_t> strides;
                 size_t stride = sizeof(float);  // 每个元素的大小
@@ -87,27 +60,148 @@ PYBIND11_MODULE(NOCUDARuntime, m) {
                     strides.insert(strides.begin(), stride);
                     stride *= *it;
                 }
-
                 // 使用大括号初始化 buffer_info
                 return py::buffer_info{
                         output_ptr,                      // 指向内存的指针
                         sizeof(float),                   // 元素的大小
                         py::format_descriptor<float>::format(),  // 数据类型
-                        self.output_dims.nbDims,                    // 维度数量
+                        self.outputDims.nbDims,                    // 维度数量
                         shape,                           // 维度大小
                         strides                          // 步长
                 };
-            })
+            });
 
-            .def_readonly("ultralytics", &RuntimeWithGraph::ultralytics, "engine style")
-            ;
+    py::class_<BaseWithWarpS, Base>(m, "BaseWithWarpS", py::buffer_protocol())
+            .def(py::init<std::string&, bool, bool, bool, uint32_t>(),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Base with shared memory name, inputPtr width, and engine path")
+
+            .def("predict", [](BaseWithWarpS& self, const py::array_t<uint8_t>& array){
+                auto shape = array.shape();
+                nvinfer1::Dims3 dims3 = nvinfer1::Dims3(shape[1], shape[0], shape[2]);
+                py::buffer_info buf = array.request();
+                self.predict(static_cast<uint8_t*>(buf.ptr), dims3);
+                }, "Execute prediction on the inputPtr data");
+
+    py::class_<BaseWithWarpT, Base>(m, "BaseWithWarpT", py::buffer_protocol())
+            .def(py::init<std::vector<int>&, std::string&, bool, bool, bool, uint32_t>(),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Base with shared memory name, inputPtr width, and engine path")
+
+//            .def_property("bgr", &BaseWithWarpT::getBGR, &BaseWithWarpT::setBGR)
+            .def_readonly("bgr", &BaseWithWarpT::BGR)
+            .def("predict", [](BaseWithWarpT& self, const py::array_t<uint8_t>& array){
+//                py::buffer_info buf = array.request();
+                self.predict(array.request().ptr);
+            }, "Execute prediction on the inputPtr data");
+
+    py::class_<Runtime, BaseWithWarpT>(m, "Runtime", py::buffer_protocol())
+            .def(py::init<std::vector<int>&, std::string&, bool, bool, bool, uint32_t>(),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Runtime with shared memory name, inputPtr width, and engine path")
+            .def(py::init<std::string&, std::vector<int>&, std::string&, bool, bool, bool, uint32_t>(),
+                 py::arg("shared memory name"),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Runtime with shared memory name, inputPtr width, and engine path")
+            .def(py::init([](py::array_t<uint8_t>& array, std::vector<int>& shapes,
+                             std::string& enginePath, bool BGR, bool ultralytics, bool dynamic,
+                             uint32_t batch) {
+                     py::buffer_info buf = array.request();
+                     if (buf.ndim != 3) {
+                         throw std::runtime_error("输入数组必须是三维的");
+                     }
+                     return new Runtime(buf.ptr, shapes, enginePath, BGR, ultralytics, dynamic, batch);
+                 }),
+                 py::arg("Array"),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Runtime with array, shapes, and engine path")
+
+            .def("set_image", [](Runtime &self, const py::array_t<uint8_t> &array) {
+                py::buffer_info buf = array.request();
+                self.setImagePtr(buf.ptr);
+            }, "Set image using numpy array")
+            .def_property("shm_name", &Runtime::getShmName, &Runtime::setShmName)
+            .def_property("image_shape", &Runtime::getShapes, &Runtime::setShapes)
+            .def("set_engine", &Runtime::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
+
+            .def("predict", &Runtime::predict, "Execute prediction on the inputPtr data");
+
+    py::class_<RuntimeCG, Runtime>(m, "RuntimeCG", py::buffer_protocol())
+            .def(py::init<std::vector<int>&, std::string&, bool, bool, bool, uint32_t>(),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Runtime with shared memory name, inputPtr width, and engine path")
+            .def(py::init<std::string&, std::vector<int>&, std::string&, bool, bool, bool, uint32_t>(),
+                 py::arg("shared memory name"),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Runtime with shared memory name, inputPtr width, and engine path")
+            .def(py::init([](const py::array_t<uint8_t>& array, const std::vector<int>& shapes,
+                             std::string& enginePath, bool BGR, bool ultralytics, bool dynamic,
+                             uint32_t batch) {
+                     py::buffer_info buf = array.request();
+                     if (buf.ndim != 3) {
+                         throw std::runtime_error("输入数组必须是三维的");
+                     }
+                     return new RuntimeCG(buf.ptr, shapes, enginePath, BGR, ultralytics, dynamic, batch);
+                 }),
+                 py::arg("array"),
+                 py::arg("image [imageWidth, imageHeight, imageChannels]"),
+                 py::arg("engine path"),
+                 py::arg("BGR") = false,
+                 py::arg("ultralytics") = false,
+                 py::arg("dynamic") = false,
+                 py::arg("batch") = 1,
+                 "Initialize Runtime with array, shapes, and engine path")
+
+            .def("set_image", [](RuntimeCG &self, const py::array_t<uint8_t> &array) {
+                py::buffer_info buf = array.request();
+                self.setImagePtr(buf.ptr);
+            }, "Set image using numpy array")
+            .def_property("shm_name", &RuntimeCG::getShmName, &RuntimeCG::setShmName)
+            .def_property("shapes", &RuntimeCG::getShapes, &RuntimeCG::setShapes)
+            .def("set_engine", &RuntimeCG::setEnginePath, py::arg("enginePath"), py::arg("ultralytics") = false)
+            .def("predict", &RuntimeCG::predict, "Execute prediction on the inputPtr data");
 
     m.def("buildEngine", &buildEngine,
           py::arg("onnxFilePath"),
           py::arg("engineFilePath"),
-          py::arg("exponent") = 1,
+          py::arg("multiplier") = 1,
           py::arg("exponent") = 22,
           py::arg("half") = false,
+          py::arg("dynamic") = false,
           py::arg("ultralytics") = false,
           "Build a TensorRT engine from an ONNX file");
 }

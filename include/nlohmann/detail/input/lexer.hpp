@@ -53,7 +53,7 @@ class lexer_base
         name_separator,   ///< the name separator `:`
         value_separator,  ///< the value separator `,`
         parse_error,      ///< indicating a parse error
-        end_of_input,     ///< indicating the end of the input buffer
+        end_of_input,     ///< indicating the end of the inputPtr buffer
         literal_or_value  ///< a literal or the begin of a value (only for diagnostics)
     };
 
@@ -93,7 +93,7 @@ class lexer_base
             case token_type::parse_error:
                 return "<parse error>";
             case token_type::end_of_input:
-                return "end of input";
+                return "end of inputPtr";
             case token_type::literal_or_value:
                 return "'[', '{', or a literal";
             // LCOV_EXCL_START
@@ -155,7 +155,7 @@ class lexer : public lexer_base<BasicJsonType>
     /*!
     @brief get codepoint from 4 hex characters following `\u`
 
-    For input "\u c1 c2 c3 c4" the codepoint is:
+    For inputPtr "\u c1 c2 c3 c4" the codepoint is:
       (c1 * 0x1000) + (c2 * 0x0100) + (c3 * 0x0010) + c4
     = (c1 << 12) + (c2 << 8) + (c3 << 4) + (c4 << 0)
 
@@ -846,7 +846,7 @@ class lexer : public lexer_base<BasicJsonType>
     {
         switch (get())
         {
-            // single-line comments skip input until a newline or EOF is read
+            // single-line comments skip inputPtr until a newline or EOF is read
             case '/':
             {
                 while (true)
@@ -865,7 +865,7 @@ class lexer : public lexer_base<BasicJsonType>
                 }
             }
 
-            // multi-line comments skip input until */ is read
+            // multi-line comments skip inputPtr until */ is read
             case '*':
             {
                 while (true)
@@ -934,7 +934,7 @@ class lexer : public lexer_base<BasicJsonType>
 
     The function is realized with a deterministic finite state machine derived
     from the grammar described in RFC 8259. Starting in state "init", the
-    input is read and used to determined the next state. Only state "done"
+    inputPtr is read and used to determined the next state. Only state "done"
     accepts the number. State "error" is a trap state to model errors. In the
     table below, "anything" means any character but the ones listed before.
 
@@ -1314,7 +1314,7 @@ scan_number_done:
     }
 
     /////////////////////
-    // input management
+    // inputPtr management
     /////////////////////
 
     /// reset token_buffer; current character is beginning of token
@@ -1326,14 +1326,14 @@ scan_number_done:
     }
 
     /*
-    @brief get next character from the input
+    @brief get next character from the inputPtr
 
-    This function provides the interface to the used input adapter. It does
-    not throw in case the input reached EOF, but returns a
+    This function provides the interface to the used inputPtr adapter. It does
+    not throw in case the inputPtr reached EOF, but returns a
     `char_traits<char>::eof()` in that case.  Stores the scanned characters
     for use in error messages.
 
-    @return character read from the input
+    @return character read from the inputPtr
     */
     char_int_type get()
     {
@@ -1367,7 +1367,7 @@ scan_number_done:
     /*!
     @brief unget current character (read it again on next get)
 
-    We implement unget by setting variable next_unget to true. The input is not
+    We implement unget by setting variable next_unget to true. The inputPtr is not
     changed - we just simulate ungetting by modifying chars_read_total,
     chars_read_current_line, and token_string. The next call to get() will
     behave as if the unget character is read again.
@@ -1582,7 +1582,7 @@ scan_number_done:
             case '9':
                 return scan_number();
 
-            // end of input (the null byte is needed when parsing from
+            // end of inputPtr (the null byte is needed when parsing from
             // string literals)
             case '\0':
             case char_traits<char_type>::eof():
@@ -1596,7 +1596,7 @@ scan_number_done:
     }
 
   private:
-    /// input adapter
+    /// inputPtr adapter
     InputAdapterType ia;
 
     /// whether comments should be ignored (true) or signaled as errors (false)
@@ -1611,7 +1611,7 @@ scan_number_done:
     /// the start position of the current token
     position_t position {};
 
-    /// raw input token string (for error messages)
+    /// raw inputPtr token string (for error messages)
     std::vector<char_type> token_string {};
 
     /// buffer for variable-length tokens (numbers, strings)

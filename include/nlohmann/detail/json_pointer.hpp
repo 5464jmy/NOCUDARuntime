@@ -231,7 +231,7 @@ class json_pointer
         char* p_end = nullptr;
         errno = 0; // strtoull doesn't reset errno
         const unsigned long long res = std::strtoull(p, &p_end, 10); // NOLINT(runtime/int)
-        if (p == p_end // invalid input or empty string
+        if (p == p_end // invalid inputPtr or empty string
                 || errno == ERANGE // out of range
                 || JSON_HEDLEY_UNLIKELY(static_cast<std::size_t>(p_end - p) != s.size())) // incomplete read
         {
@@ -655,7 +655,7 @@ class json_pointer
     }
 
     /*!
-    @brief split the string input to reference tokens
+    @brief split the string inputPtr to reference tokens
 
     @note This function is only called by the json_pointer constructor.
           All exceptions below are documented there.

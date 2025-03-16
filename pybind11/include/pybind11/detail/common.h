@@ -99,7 +99,7 @@
 #            define PYBIND11_CPP17
 #            if __cplusplus >= 202002L
 #                define PYBIND11_CPP20
-// Please update tests/pybind11_tests.cpp `cpp_std()` when adding a macro here.
+// Please updateImageOutSize tests/pybind11_tests.cpp `cpp_std()` when adding a macro here.
 #            endif
 #        endif
 #    endif
@@ -941,7 +941,7 @@ struct is_instantiation<Class, Class<Us...>> : std::true_type {};
 template <typename T>
 using is_shared_ptr = is_instantiation<std::shared_ptr, T>;
 
-/// Check if T looks like an input iterator
+/// Check if T looks like an inputPtr iterator
 template <typename T, typename = void>
 struct is_input_iterator : std::false_type {};
 template <typename T>

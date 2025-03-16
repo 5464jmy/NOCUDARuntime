@@ -178,7 +178,7 @@ macro(_PYBIND11_GET_IF_UNDEF lst index name)
   endif()
 endmacro()
 
-# Convert the process output into a list
+# Convert the process outputPtr into a list
 if(WIN32)
   string(REGEX REPLACE "\\\\" "/" _PYTHON_VALUES ${_PYTHON_VALUES})
 endif()

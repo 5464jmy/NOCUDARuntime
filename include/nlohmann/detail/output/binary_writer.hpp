@@ -46,7 +46,7 @@ class binary_writer
     /*!
     @brief create a binary writer
 
-    @param[in] adapter  output adapter to write to
+    @param[in] adapter  outputPtr adapter to write to
     */
     explicit binary_writer(output_adapter_t<CharType> adapter) : oa(std::move(adapter))
     {
@@ -970,7 +970,7 @@ class binary_writer
     }
 
     /*!
-    @brief Writes the given @a element_type and @a name to the output adapter
+    @brief Writes the given @a element_type and @a name to the outputPtr adapter
     */
     void write_bson_entry_header(const string_t& name,
                                  const std::uint8_t element_type)
@@ -1729,9 +1729,9 @@ class binary_writer
     ///////////////////////
 
     /*
-    @brief write a number to output input
+    @brief write a number to outputPtr inputPtr
     @param[in] n number of type @a NumberType
-    @param[in] OutputIsLittleEndian Set to true if output data is
+    @param[in] OutputIsLittleEndian Set to true if outputPtr data is
                                  required to be little endian
     @tparam NumberType the type of the number
 
@@ -1748,7 +1748,7 @@ class binary_writer
         std::array<CharType, sizeof(NumberType)> vec{};
         std::memcpy(vec.data(), &n, sizeof(NumberType));
 
-        // step 2: write array to output (with possible reordering)
+        // step 2: write array to outputPtr (with possible reordering)
         if (is_little_endian != OutputIsLittleEndian)
         {
             // reverse byte order prior to conversion if necessary
@@ -1830,7 +1830,7 @@ class binary_writer
     /// whether we can assume little endianness
     const bool is_little_endian = little_endianness();
 
-    /// the output
+    /// the outputPtr
     output_adapter_t<CharType> oa = nullptr;
 };
 

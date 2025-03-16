@@ -377,10 +377,10 @@ use cases when exposing C++ classes to Python. Sometimes it is hard or unwieldy
 to create a direct one-on-one mapping between the arguments and method return
 type.
 
-An example would be when the C++ signature contains output arguments using
+An example would be when the C++ signature contains outputPtr arguments using
 references (See also :ref:`faq_reference_arguments`). Another way of solving
 this is to use the method body of the trampoline class to do conversions to the
-input and return of the Python method.
+inputPtr and return of the Python method.
 
 The main building block to do so is the :func:`get_override`, this function
 allows retrieving a method implemented in Python from within the trampoline's

@@ -1,16 +1,13 @@
 #ifndef RUNTIME_H
 #define RUNTIME_H
 
-// Windows平台下的DLL导出和导入宏定义
-#ifdef _WIN32
-#ifdef DLL_EXPORT
-#define API __declspec(dllexport)  // 导出符号
-#else
-#define API __declspec(dllimport)  // 导入符号
-#endif
-#else
-#define API  // 如果不是在Windows平台上，API定义为空
-#endif
+//// Windows 平台下的 DLL 导出和导入宏定义
+//#ifdef EXPORT_DLL  // 如果在 DLL 项目中定义
+//    #define API __declspec(dllexport)
+//#else  // 如果在使用 DLL 的项目中定义
+//    #define API __declspec(dllimport)
+//#endif
+
 
 // 引入了所需的库头文件
 #include <string>
@@ -26,9 +23,9 @@
 #include <NvInferRuntime.h>
 #include <NvInferPlugin.h>
 #include <cuda_runtime.h>
-//#include <opencv2//opencv.hpp>
 #include <device_launch_parameters.h>
 
+#include <opencv2//opencv.hpp>
 // 自定义头文件
 #include "cudaWarp.h"
 #include "tensor.h"
@@ -37,67 +34,162 @@
 
 using namespace std;
 
-// 使用API宏确保在共享库中导出类
-class API RuntimeWithGraph {
+vector<char> loadFile(const string& filePath, bool ultralytics);
+void pointSharedMemory(string& shm_name, uint64_t& imageSize, void** host_ptr, HANDLE& hMapFile);
+
+class API Base{
 public:
-    // 构造函数，接受共享内存名称、输入宽度和引擎路径
-    RuntimeWithGraph(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics);
+    Base(string& enginePath, bool ultralytics = false, bool dynamic = false, uint32_t batch=1);
 
-    // 构造函数，接受图像指针、输入宽度和引擎路径
-    RuntimeWithGraph(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics);
+    void Init();
 
-    // 成员函数的声明
-    void setImagePtr(void* image_ptr);
-    void setShmName(string& shmName);
-    string getShmName();
-    void setEnginePath(string& shmName, bool ultralytics_in);
-    string getEnginePath();
-    void setShapes(const vector<int>& shapes);
-    vector<int> getShapes();
+    void InitTensor();  // 初始化张量
 
-    void InitTensors();  // 初始化张量
+    void predict(float * image);  // 执行预测
 
-    void pointSharedMemory();  // 指向共享内存
+    virtual ~Base();  // 析构函数
 
-    void createGraph();  // 创建CUDA图
+    virtual void setEnginePath(string &engine_path, bool ultralytics_in);
 
-    void predict();  // 执行预测
-
-    ~RuntimeWithGraph();  // 析构函数
-
-    // 公有成员变量
-    string shm_name{};
-    string engine_path{};
+    string enginePath{};
     bool ultralytics{};
     int height{};
     int width{};
-    int imageWidth{};
-    int imageHeight{};
-    int imageChannels{};
 
-    nvinfer1::Dims32 input_dims{};  // 输入张量维度
-    nvinfer1::Dims32 output_dims{}; // 输出张量维度
+    bool  dynamic{false};
+    uint32_t batch{1};
 
-    Tensor output_Tensor{};  // 输出张量
-    void* host_ptr{nullptr}; // 主机内存指针
+    nvinfer1::Dims32 inputDims{};
+    nvinfer1::Dims32 outputDims{};
 
-private:
-    HANDLE hMapFile{};  // 文件映射句柄，用于共享内存
+    Tensor inputTensor{};
+    Tensor outputTensor{};
+protected:
+    std::shared_ptr<EngineContext> engineCtx{};
+    cudaStream_t inferStream{nullptr};
 
-    std::shared_ptr<EngineContext> engineCtx{};  // 引擎上下文指针
+    uint64_t input_bytes{};
+    uint64_t output_bytes{};
+    uint64_t imageSize{0};  // 图像大小
+};
 
-    cudaGraphExec_t inferGraphExec{};  // CUDA图执行实例
-    cudaStream_t inferStream{nullptr}; // CUDA流
-    cudaGraph_t inferGraph{};  // CUDA图
+class API BaseWithWarpS : public Base{
+public:
+    BaseWithWarpS(string& enginePath, bool BGR= false, bool ultralytics = false, bool dynamic= false, uint32_t batch=1);;
 
-    Tensor input_Tensor{};  // 输入张量
-    int64_t input_bytes{};  // 输入张量的字节数
-    int64_t output_bytes{}; // 输出张量的字节数
+    void predict(uint8_t* image, const nvinfer1::Dims3& dims);  // 执行预测
+    virtual ~BaseWithWarpS() override;  // 析构函数
+protected:
+    uint64_t imageSize{0};  // 图像大小
 
     std::shared_ptr<Tensor> imageTensor{}; // 图像张量的智能指针
-    int64_t imageSize{};  // 图像大小
-
     WarpAffine* warpAffine{nullptr};
 };
 
+class API BaseWithWarpT : public Base{
+public:
+    BaseWithWarpT(const vector<int>& shapes, string& enginePath, bool BGR = false, bool ultralytics = false, bool dynamic= false, uint32_t batch=1);;
+
+    bool BGR{false};
+    int imageWidth{0};
+    int imageHeight{0};
+    int imageChannels{0};
+    void predict(void* image);  // 执行预测
+    virtual ~BaseWithWarpT();  // 析构函数
+protected:
+
+    std::shared_ptr<Tensor> imageTensor{}; // 图像张量的智能指针
+    WarpAffine* warpAffine{nullptr};
+};
+
+class API Runtime : public BaseWithWarpT{
+
+public:
+    Runtime(const vector<int>& shapes, string& enginePath, bool BGR= false,
+            bool ultralytics= false, bool dynamic=false, uint32_t batch=1);
+    Runtime(string& shmName, const vector<int>& shapes, string& enginePath, bool BGR= false,
+            bool ultralytics= false, bool dynamic=false, uint32_t batch=1);
+    Runtime(void* image_ptr, const vector<int>& shapes, string& enginePath, bool BGR= false,
+            bool ultralytics= false, bool dynamic=false, uint32_t batch=1);
+
+    void predict();  // 执行预测
+    virtual ~Runtime() ;  // 析构函数
+
+    virtual void setImagePtr(void* image_ptr);
+    virtual void setShmName(string& shmName);
+    virtual string getShmName();
+    virtual void setShapes(const vector<int> &shapes);
+    virtual vector<int> getShapes();
+    // 公有成员变量
+    string shm_name;
+    void* host_ptr{nullptr}; // 主机内存指针
+protected:
+    HANDLE hMapFile{};  // 文件映射句柄，用于共享内存
+};
+
+// 使用API宏确保在共享库中导出类
+class API RuntimeCG : public Runtime {
+public:
+    RuntimeCG(const vector<int>& shapes, string& enginePath, bool BGR=false,
+              bool ultralytics=false, bool dynamic=false, uint32_t batch=1);
+    RuntimeCG(string& shmName, const vector<int>& shapes, string& enginePath, bool BGR=false,
+              bool ultralytics=false, bool dynamic=false, uint32_t batch=1);
+    RuntimeCG(void* imagePtr, const vector<int>& shapes, string& enginePath, bool BGR= false,
+              bool ultralytics=false, bool dynamic=false, uint32_t batch=1);
+
+    void createGraph();  // 创建CUDA图
+    void predict() ;  // 执行预测
+    virtual ~RuntimeCG() ;  // 析构函数
+
+    // 成员函数的声明
+    void setImagePtr(void* image_ptr) override;
+    void setShmName(string& shmName) override;
+    void setEnginePath(string &engine_path, bool ultralytics_in) override;
+    void setShapes(const vector<int> &shapes) override;
+private:
+    // CUDA图执行实例
+    cudaGraph_t inferGraph{};  // CUDA图
+    cudaGraphExec_t inferGraphExec{};
+};
 #endif // RUNTIME_H
+
+
+//// 使用API宏确保在共享库中导出类
+//class API RuntimeCG : public Runtime {
+//public:
+////    RuntimeCG(string& shmName, const vector<int>& shapes, string& enginePath):
+////            RuntimeCG(shmName, shapes, enginePath, false, false, 1){};
+////    RuntimeCG(string& shmName, const vector<int>& shapes, string& enginePath, bool ultralytics):
+////            RuntimeCG(shmName, shapes, enginePath, ultralytics, false, 1){};
+////    RuntimeCG(string& shmName, const vector<int>& shapes, string& enginePath, bool dynamic, uint32_t batch):
+////            RuntimeCG(shmName, shapes, enginePath, false, dynamic, batch){};
+//    RuntimeCG(string& shmName, const vector<int>& shapes, string& enginePath, bool BGR= false,
+//              bool ultralytics= false, bool dynamic=false, uint32_t batch=1);
+//
+////    RuntimeCG(void* image_ptr, const vector<int>& shapes, string& enginePath):
+////            RuntimeCG(image_ptr, shapes, enginePath, false, false, 1){};
+////    RuntimeCG(void* image_ptr, const vector<int>& shapes, string& enginePath, bool ultralytics):
+////            RuntimeCG(image_ptr, shapes, enginePath, ultralytics, false, 1){};
+////    RuntimeCG(void* image_ptr, const vector<int>& shapes, string& enginePath, bool dynamic, uint32_t batch):
+////            RuntimeCG(image_ptr, shapes, enginePath, false, dynamic, batch){};
+//    RuntimeCG(void* image_ptr, const vector<int>& shapes, string& enginePath, bool BGR= false,
+//              bool ultralytics=false, bool dynamic=false, uint32_t batch=1);
+//
+//    void createGraph();  // 创建CUDA图
+//    void predict() override ;  // 执行预测
+//    ~RuntimeCG() override;  // 析构函数
+//
+//    // 成员函数的声明
+//    void setImagePtr(void* image_ptr);
+//    void setShmName(string& shmName);
+//    string getShmName();
+//    void setEnginePath(string &enginePath, bool ultralytics_in);
+//    string getEnginePath();
+//    void setShapes(const vector<int> &shapes);
+//    vector<int> getShapes();
+//private:
+//    // CUDA图执行实例
+//    cudaGraph_t inferGraph{};  // CUDA图
+//    cudaGraphExec_t inferGraphExec{};
+//};
+//#endif // RUNTIME_H

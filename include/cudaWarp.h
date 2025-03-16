@@ -37,23 +37,32 @@ extern "C" struct TransformMatrix {
  * @brief 表示用于仿射变换的 2x3 转换矩阵的结构体。
  */
 extern "C" struct WarpAffine {
-    dim3 blockDim{};   // 用于仿射变换的 2x3 矩阵。
-    dim3 gridDim{};   // 用于仿射变换的 2x3 矩阵。
+    dim3 BlocksPerGrid{};   // 用于仿射变换的 2x3 矩阵。
+    dim3 threadsPerBlock{};   // 用于仿射变换的 2x3 矩阵。
 
-    uint8_t* input;
-    uint32_t inputWidth, inputHeight;
-    float* output;
-    uint32_t outputWidth, outputHeight;
+    uint8_t * inputPtr;
+    uint32_t fromWidth, fromHeight;
+    float * outputPtr;
+    uint32_t toWidth, toHeight;
+
+    uint32_t Channel;
 
     TransformMatrix* transforms{nullptr};
     cudaStream_t stream{nullptr};
 
+    bool BGR{false};
+
     WarpAffine(void *input, uint32_t imageWidth, uint32_t imageHeight,
-               void *output, uint32_t toWidth, uint32_t toHeight,
+               void *output, uint32_t outputWidth, uint32_t outputHeight,
+               uint32_t Channel, bool BGR,
                cudaStream_t stream);
 
 
-//    void update(uint32_t outputWidth, uint32_t outputHeight);
+    void updateImageOutSize(uint32_t imageWidth, uint32_t imageHeight, uint32_t imageChannel = 3);
+
+    void updateImageInputPtr(void *input);
+
+    void updateBGR(bool bgr);
 
     /**
      * @brief 使用 CUDA 应用仿射变换。
@@ -67,8 +76,8 @@ extern "C" struct WarpAffine {
      * @param matrix 仿射变换矩阵。
      * @param stream 用于异步执行的 CUDA 流（可选）。
      */
-
     void cudaWarpAffine();
+    void cudaCutImg();
 };
 
 

@@ -215,7 +215,7 @@ To check if a file needs formatting:
 clang-format -style=file --dry-run some.cpp
 ```
 
-The output will show things to be fixed, if any. To actually format the file:
+The outputPtr will show things to be fixed, if any. To actually format the file:
 
 ```bash
 clang-format -style=file -i some.cpp
@@ -236,7 +236,7 @@ so you can use git to monitor the changes.
 
 ```bash
 docker run --rm -v $PWD:/mounted_pybind11 -it silkeh/clang:15-bullseye
-apt-get update && apt-get install -y git python3-dev python3-pytest
+apt-get updateImageOutSize && apt-get install -y git python3-dev python3-pytest
 cmake -S /mounted_pybind11/ -B build -DCMAKE_CXX_CLANG_TIDY="$(which clang-tidy);--use-color" -DDOWNLOAD_EIGEN=ON -DDOWNLOAD_CATCH=ON -DCMAKE_CXX_STANDARD=17
 cmake --build build -j 2
 ```
@@ -271,7 +271,7 @@ This will test the PGI compilers:
 
 ```bash
 docker run --rm -it -v $PWD:/pybind11 nvcr.io/hpc/pgi-compilers:ce
-apt-get update && apt-get install -y python3-dev python3-pip python3-pytest
+apt-get updateImageOutSize && apt-get install -y python3-dev python3-pip python3-pytest
 wget -qO- "https://cmake.org/files/v3.18/cmake-3.18.2-Linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C /usr/local
 cmake -S pybind11/ -B build
 cmake --build build

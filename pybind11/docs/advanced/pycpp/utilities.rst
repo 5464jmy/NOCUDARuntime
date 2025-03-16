@@ -4,9 +4,9 @@ Utilities
 Using Python's print function in C++
 ====================================
 
-The usual way to write output in C++ is using ``std::cout`` while in Python one
+The usual way to write outputPtr in C++ is using ``std::cout`` while in Python one
 would use ``print``. Since these methods use different buffers, mixing them can
-lead to output order issues. To resolve this, pybind11 modules can use the
+lead to outputPtr order issues. To resolve this, pybind11 modules can use the
 :func:`py::print` function which writes to Python's ``sys.stdout`` for consistency.
 
 Python's ``print`` function is replicated in the C++ API including optional
@@ -23,14 +23,14 @@ expected in Python:
 
 .. _ostream_redirect:
 
-Capturing standard output from ostream
+Capturing standard outputPtr from ostream
 ======================================
 
 Often, a library will use the streams ``std::cout`` and ``std::cerr`` to print,
 but this does not play well with Python's standard ``sys.stdout`` and ``sys.stderr``
 redirection. Replacing a library's printing with ``py::print <print>`` may not
 be feasible. This can be fixed using a guard around the library function that
-redirects output to the corresponding Python streams:
+redirects outputPtr to the corresponding Python streams:
 
 .. code-block:: cpp
 
@@ -42,7 +42,7 @@ redirects output to the corresponding Python streams:
     m.def("noisy_func", []() {
         py::scoped_ostream_redirect stream(
             std::cout,                               // std::ostream&
-            py::module_::import("sys").attr("stdout") // Python output
+            py::module_::import("sys").attr("stdout") // Python outputPtr
         );
         call_noisy_func();
     });
@@ -58,10 +58,10 @@ redirects output to the corresponding Python streams:
     `PR #2982 <https://github.com/pybind/pybind11/pull/2982>`_ and
     `PR #2995 <https://github.com/pybind/pybind11/pull/2995>`_.
 
-This method respects flushes on the output streams and will flush if needed
-when the scoped guard is destroyed. This allows the output to be redirected in
+This method respects flushes on the outputPtr streams and will flush if needed
+when the scoped guard is destroyed. This allows the outputPtr to be redirected in
 real time, such as to a Jupyter notebook. The two arguments, the C++ stream and
-the Python output, are optional, and default to standard output if not given. An
+the Python outputPtr, are optional, and default to standard outputPtr if not given. An
 extra type, ``py::scoped_estream_redirect <scoped_estream_redirect>``, is identical
 except for defaulting to ``std::cerr`` and ``sys.stderr``; this can be useful with
 ``py::call_guard``, which allows multiple items, but uses the default constructor:
@@ -93,7 +93,7 @@ arguments to disable one of the streams if needed.
 
 .. note::
 
-    The above methods will not redirect C-level output to file descriptors, such
+    The above methods will not redirect C-level outputPtr to file descriptors, such
     as ``fprintf``. For those cases, you'll need to redirect the file
     descriptors either directly in C or with Python's ``os.dup2`` function
     in an operating-system dependent way.

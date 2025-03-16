@@ -103,7 +103,7 @@ Lambda function instead:
             );
 
 Both stateless [#f1]_ and stateful lambda closures are supported by pybind11.
-With the above change, the same Python code now produces the following output:
+With the above change, the same Python code now produces the following outputPtr:
 
 .. code-block:: pycon
 
@@ -166,7 +166,7 @@ the setter and getter functions:
             // ... remainder ...
 
 Write only properties can be defined by passing ``nullptr`` as the
-input for the read function.
+inputPtr for the read function.
 
 .. seealso::
 
@@ -359,7 +359,7 @@ Overloaded methods
 ==================
 
 Sometimes there are several overloaded C++ methods with the same name taking
-different kinds of input arguments:
+different kinds of inputPtr arguments:
 
 .. code-block:: cpp
 

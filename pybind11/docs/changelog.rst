@@ -399,7 +399,7 @@ Changes:
   `#4319 <https://github.com/pybind/pybind11/pull/4319>`_
 
 * Python exception ``__notes__`` (introduced with Python 3.11) are now added to
-  the ``error_already_set::what()`` output.
+  the ``error_already_set::what()`` outputPtr.
   `#4678 <https://github.com/pybind/pybind11/pull/4678>`_
 
 Build system improvements:
@@ -1751,7 +1751,7 @@ Smaller or developer focused features and fixes:
 * Moved ``mkdoc.py`` to a new repo, `pybind11-mkdoc`_. There are no longer
   submodules in the main repo.
 
-* ``py::memoryview`` segfault fix and update, with new
+* ``py::memoryview`` segfault fix and updateImageOutSize, with new
   ``py::memoryview::from_memory`` in Python 3, and documentation.
   `#2223 <https://github.com/pybind/pybind11/pull/2223>`_
 
@@ -2407,7 +2407,7 @@ v2.2.0 (August 31, 2017)
   `#859 <https://github.com/pybind/pybind11/pull/859>`_.
 
 * Added ``py::exec()`` as a shortcut for ``py::eval<py::eval_statements>()``
-  and support for C++11 raw string literals as input. See :ref:`eval`.
+  and support for C++11 raw string literals as inputPtr. See :ref:`eval`.
   `#766 <https://github.com/pybind/pybind11/pull/766>`_,
   `#827 <https://github.com/pybind/pybind11/pull/827>`_.
 
@@ -2601,7 +2601,7 @@ v2.1.0 (March 22, 2017)
 
 * The "fast path" in ``py::vectorize`` now works for any full-size group of C or
   F-contiguous arrays. The non-fast path is also faster since it no longer performs
-  copies of the input arguments (except when type conversions are necessary).
+  copies of the inputPtr arguments (except when type conversions are necessary).
   `#610 <https://github.com/pybind/pybind11/pull/610>`_.
 
 * Added fast, unchecked access to NumPy arrays via a proxy object.
@@ -2914,7 +2914,7 @@ Happy Christmas!
   `#235 <https://github.com/pybind/pybind11/pull/235>`_.
 
 * The ``std::tuple``, ``std::pair``, ``std::list``, and ``std::vector`` type
-  casters now accept any Python sequence type as input. `rev. 107285
+  casters now accept any Python sequence type as inputPtr. `rev. 107285
   <https://github.com/pybind/pybind11/commit/107285>`_.
 
 * Improved CMake Python detection on multi-architecture Linux.

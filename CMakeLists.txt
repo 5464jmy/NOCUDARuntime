@@ -1,5 +1,3 @@
-
-
 cmake_minimum_required(VERSION 3.12)
 project(NOCUDARuntime LANGUAGES CXX CUDA)
 
@@ -15,8 +13,8 @@ if(MSVC)
 endif()
 
 # 查找自定义 Python 可执行文件的位置
-set(PYTHON_EXECUTABLE "D:/element/anaconda3/envs/CS2-1/python.exe")
-set(PYBIND11_PYTHON_VERSION 3.10)
+set(PYTHON_EXECUTABLE "D:/element/anaconda3/envs/mamba/python.exe")
+set(PYBIND11_PYTHON_VERSION 3.8)
 
 # Set custom CUDA path
 set(CUDA_TOOLKIT_ROOT_DIR "D:/element/cuda/gpu")
@@ -29,25 +27,31 @@ include_directories(${TENSORRT_INCLUDE_DIR})
 link_directories(${TENSORRT_LIBRARY_DIR})
 
 
+# OpenCV configuration
+set(OpenCV_DIR "D:/element/opencv/build")  # Set OpenCV directory
+find_package(OpenCV REQUIRED)
+
 # Include directories
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 include_directories(${INCLUDE_DIR}
         ${CUDA_INCLUDE_DIRS}
         ${TENSORRT_INCLUDE_DIR}
-#        ${OpenCV_INCLUDE_DIRS}
-        "D:/element/cuda/samples/common/inc")
+        ${OpenCV_INCLUDE_DIRS}
+#        "D:/element/cuda/samples/common/inc"
+)
 
 # Find source files
 file(GLOB_RECURSE SOURCES
         "${SRC_DIR}/*.cpp"
         "${SRC_DIR}/*.cu"
-        "D:/element/cuda/samples/common/src/*.cpp"
+#        "D:/element/cuda/samples/common/src/*.cpp"
 )
 
 # Libraries
 set(LIBS ${CUDA_LIBRARIES}
-        d3d12 dxgi d3dcompiler dxguid nvinfer nvonnxparser nvinfer_plugin
+        ${OpenCV_LIBS}
+        nvinfer nvonnxparser nvinfer_plugin
 )
 
 # Shared and Static libraries
@@ -63,7 +67,7 @@ pybind11_add_module(NOCUDARuntime python/bindings.cpp)
 target_link_libraries(NOCUDARuntime PRIVATE detect_dll ${LIBS})
 
 # Executable
-add_executable(MyExecutable ${SOURCES})
+add_executable(MyExecutable ${SOURCES} main.cpp)
 
 # Link libraries
 target_link_libraries(MyExecutable PRIVATE ${LIBS})
@@ -73,3 +77,4 @@ set_property(TARGET detect_dll PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES
 set_property(TARGET detect_dllStatic PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
 set_property(TARGET NOCUDARuntime PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
 set_property(TARGET MyExecutable PROPERTY CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
+add_definitions(-DEXPORT_DLL)

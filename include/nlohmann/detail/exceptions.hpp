@@ -165,9 +165,9 @@ class parse_error : public exception
     /*!
     @brief byte index of the parse error
 
-    The byte index of the last read character in the input file.
+    The byte index of the last read character in the inputPtr file.
 
-    @note For an input with n bytes, 1 is the index of the first character and
+    @note For an inputPtr with n bytes, 1 is the index of the first character and
           n+1 is the index of the terminating null byte or the end of file.
           This also holds true when reading a byte vector (CBOR or MessagePack).
     */

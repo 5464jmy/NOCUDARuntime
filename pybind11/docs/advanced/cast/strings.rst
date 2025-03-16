@@ -207,8 +207,8 @@ UTF-8/16/32 before being returned to Python.
 Character literals
 ==================
 
-C++ functions that accept character literals as input will receive the first
-character of a Python ``str`` as their input. If the string is longer than one
+C++ functions that accept character literals as inputPtr will receive the first
+character of a Python ``str`` as their inputPtr. If the string is longer than one
 Unicode character, trailing characters will be ignored.
 
 When a character literal is returned from C++ (such as a ``char`` or a

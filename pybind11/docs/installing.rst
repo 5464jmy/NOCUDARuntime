@@ -19,7 +19,7 @@ as a submodule. From your git repository, use:
 .. code-block:: bash
 
     git submodule add -b stable ../../pybind/pybind11 extern/pybind11
-    git submodule update --Runtime
+    git submodule updateImageOutSize --Runtime
 
 This assumes you are placing your dependencies in ``extern/``, and that you are
 using GitHub; if you are not using GitHub, use the full https or ssh URL

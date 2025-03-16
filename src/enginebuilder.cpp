@@ -7,10 +7,11 @@
 
 void buildEngine(const std::string& onnxFilePath,
                  const std::string& engineFilePath,
-                 int multiplier = 1,
-                 int exponent = 22,
-                 bool half = false,
-                 bool ultralytics = false) {
+                 int multiplier,
+                 int exponent,
+                 bool half,
+                 bool ultralytics,
+                 bool dynamic) {
     // 创建日志记录器
     logger logger;
 
@@ -49,6 +50,16 @@ void buildEngine(const std::string& onnxFilePath,
         network->destroy();
         builder->destroy();
         throw std::runtime_error("Failed to parse ONNX file");
+    }
+    if (dynamic) {
+        nvinfer1::Dims4 MIN{1, 3, 640, 640};
+        nvinfer1::Dims4 OPT{8, 3, 640, 640};
+        nvinfer1::Dims4 MAX{16, 3, 640, 640};
+        auto profile = builder->createOptimizationProfile();
+        profile->setDimensions(network->getInput(0)->getName(), nvinfer1::OptProfileSelector::kMIN, MIN);
+        profile->setDimensions(network->getInput(0)->getName(), nvinfer1::OptProfileSelector::kOPT, OPT);
+        profile->setDimensions(network->getInput(0)->getName(), nvinfer1::OptProfileSelector::kMAX, MAX);
+        config->addOptimizationProfile(profile);
     }
 
     // 设置内存限制

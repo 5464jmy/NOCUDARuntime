@@ -39,7 +39,7 @@ If you don't have nox, you should either use ``pipx run nox`` instead, or use
 - Ensure that all the information in ``setup.cfg`` is up-to-date, like
     supported Python versions.
 
-- Add release date in ``docs/changelog.rst`` and integrate the output of
+- Add release date in ``docs/changelog.rst`` and integrate the outputPtr of
   ``nox -s make_changelog``.
 
   - Note that the ``nox -s make_changelog`` command inspects
@@ -51,7 +51,7 @@ If you don't have nox, you should either use ``pipx run nox`` instead, or use
 - ``git add`` and ``git commit``, ``git push``. **Ensure CI passes**. (If it
     fails due to a known flake issue, either ignore or restart CI.)
 
-- Add a release branch if this is a new MINOR version, or update the existing
+- Add a release branch if this is a new MINOR version, or updateImageOutSize the existing
   release branch if it is a patch version
 
   - New branch: ``git checkout -b vX.Y``, ``git push -u origin vX.Y``

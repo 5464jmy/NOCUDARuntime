@@ -78,7 +78,7 @@ class binary_reader
     /*!
     @brief create a binary reader
 
-    @param[in] adapter  input adapter to read from
+    @param[in] adapter  inputPtr adapter to read from
     */
     explicit binary_reader(InputAdapterType&& adapter, const input_format_t format = input_format_t::json) noexcept : ia(std::move(adapter)), input_format(format)
     {
@@ -95,7 +95,7 @@ class binary_reader
     /*!
     @param[in] format  the binary format to parse
     @param[in] sax_    a SAX event processor
-    @param[in] strict  whether to expect the input to be consumed completed
+    @param[in] strict  whether to expect the inputPtr to be consumed completed
     @param[in] tag_handler  how to treat CBOR tags
 
     @return whether parsing was successful
@@ -148,7 +148,7 @@ class binary_reader
             if (JSON_HEDLEY_UNLIKELY(current != char_traits<char_type>::eof()))
             {
                 return sax->parse_error(chars_read, get_token_string(), parse_error::create(110, chars_read,
-                                        exception_message(input_format, concat("expected end of input; last byte: 0x", get_token_string()), "value"), nullptr));
+                                        exception_message(input_format, concat("expected end of inputPtr; last byte: 0x", get_token_string()), "value"), nullptr));
             }
         }
 
@@ -183,7 +183,7 @@ class binary_reader
     }
 
     /*!
-    @brief Parses a C-style string from the BSON input.
+    @brief Parses a C-style string from the BSON inputPtr.
     @param[in,out] result  A reference to the string variable where the read
                             string is to be stored.
     @return `true` if the \x00-byte indicating the end of the string was
@@ -209,7 +209,7 @@ class binary_reader
 
     /*!
     @brief Parses a zero-terminated string of length @a len from the BSON
-           input.
+           inputPtr.
     @param[in] len  The length (including the zero-byte at the end) of the
                     string to be read.
     @param[in,out] result  A reference to the string variable where the read
@@ -232,7 +232,7 @@ class binary_reader
     }
 
     /*!
-    @brief Parses a byte array input of length @a len from the BSON input.
+    @brief Parses a byte array inputPtr of length @a len from the BSON inputPtr.
     @param[in] len  The length of the byte array to be read.
     @param[in,out] result  A reference to the binary variable where the read
                             array is to be stored.
@@ -261,7 +261,7 @@ class binary_reader
     /*!
     @brief Read a BSON document element of the given @a element_type.
     @param[in] element_type The BSON element type, c.f. http://bsonspec.org/spec.html
-    @param[in] element_type_parse_position The position in the input stream,
+    @param[in] element_type_parse_position The position in the inputPtr stream,
                where the `element_type` was read.
     @warning Not all BSON element types are supported yet. An unsupported
              @a element_type will give rise to a parse_error.114:
@@ -383,7 +383,7 @@ class binary_reader
     }
 
     /*!
-    @brief Reads an array from the BSON input and passes it to the SAX-parser.
+    @brief Reads an array from the BSON inputPtr and passes it to the SAX-parser.
     @return whether a valid BSON-array was passed to the SAX parser
     */
     bool parse_bson_array()
@@ -410,7 +410,7 @@ class binary_reader
 
     /*!
     @param[in] get_char  whether a new character should be retrieved from the
-                         input (true) or whether the last read character should
+                         inputPtr (true) or whether the last read character should
                          be considered instead (false)
     @param[in] tag_handler how CBOR tags should be treated
 
@@ -1821,7 +1821,7 @@ class binary_reader
 
     /*!
     @param[in] get_char  whether a new character should be retrieved from the
-                         input (true, default) or whether the last read
+                         inputPtr (true, default) or whether the last read
                          character should be considered instead
 
     @return whether a valid UBJSON value was passed to the SAX parser
@@ -1840,7 +1840,7 @@ class binary_reader
 
     @param[out] result   created string
     @param[in] get_char  whether a new character should be retrieved from the
-                         input (true, default) or whether the last read
+                         inputPtr (true, default) or whether the last read
                          character should be considered instead
 
     @return whether string creation completed
@@ -1996,9 +1996,9 @@ class binary_reader
 
     /*!
     @param[out] result  determined size
-    @param[in,out] is_ndarray  for input, `true` means already inside an ndarray vector
+    @param[in,out] is_ndarray  for inputPtr, `true` means already inside an ndarray vector
                                or ndarray dimension is not allowed; `false` means ndarray
-                               is allowed; for output, `true` means an ndarray is found;
+                               is allowed; for outputPtr, `true` means an ndarray is found;
                                is_ndarray can only return `true` when its initial value
                                is `false`
     @param[in] prefix  type marker if already read, otherwise set to 0
@@ -2740,13 +2740,13 @@ class binary_reader
     ///////////////////////
 
     /*!
-    @brief get next character from the input
+    @brief get next character from the inputPtr
 
-    This function provides the interface to the used input adapter. It does
-    not throw in case the input reached EOF, but returns a -'ve valued
+    This function provides the interface to the used inputPtr adapter. It does
+    not throw in case the inputPtr reached EOF, but returns a -'ve valued
     `char_traits<char_type>::eof()` in that case.
 
-    @return character read from the input
+    @return character read from the inputPtr
     */
     char_int_type get()
     {
@@ -2755,7 +2755,7 @@ class binary_reader
     }
 
     /*!
-    @return character read from the input after ignoring all 'N' entries
+    @return character read from the inputPtr after ignoring all 'N' entries
     */
     char_int_type get_ignore_noop()
     {
@@ -2769,7 +2769,7 @@ class binary_reader
     }
 
     /*
-    @brief read a number from the input
+    @brief read a number from the inputPtr
 
     @tparam NumberType the type of the number
     @param[in] format   the current format (for diagnostics)
@@ -2786,7 +2786,7 @@ class binary_reader
     template<typename NumberType, bool InputIsLittleEndian = false>
     bool get_number(const input_format_t format, NumberType& result)
     {
-        // step 1: read input into array with system's byte order
+        // step 1: read inputPtr into array with system's byte order
         std::array<std::uint8_t, sizeof(NumberType)> vec{};
         for (std::size_t i = 0; i < sizeof(NumberType); ++i)
         {
@@ -2813,7 +2813,7 @@ class binary_reader
     }
 
     /*!
-    @brief create a string by reading characters from the input
+    @brief create a string by reading characters from the inputPtr
 
     @tparam NumberType the type of the number
     @param[in] format the current format (for diagnostics)
@@ -2824,7 +2824,7 @@ class binary_reader
 
     @note We can not reserve @a len bytes for the result, because @a len
           may be too large. Usually, @ref unexpect_eof() detects the end of
-          the input before we run out of string memory.
+          the inputPtr before we run out of string memory.
     */
     template<typename NumberType>
     bool get_string(const input_format_t format,
@@ -2846,7 +2846,7 @@ class binary_reader
     }
 
     /*!
-    @brief create a byte array by reading bytes from the input
+    @brief create a byte array by reading bytes from the inputPtr
 
     @tparam NumberType the type of the number
     @param[in] format the current format (for diagnostics)
@@ -2857,7 +2857,7 @@ class binary_reader
 
     @note We can not reserve @a len bytes for the result, because @a len
           may be too large. Usually, @ref unexpect_eof() detects the end of
-          the input before we run out of memory.
+          the inputPtr before we run out of memory.
     */
     template<typename NumberType>
     bool get_binary(const input_format_t format,
@@ -2889,7 +2889,7 @@ class binary_reader
         if (JSON_HEDLEY_UNLIKELY(current == char_traits<char_type>::eof()))
         {
             return sax->parse_error(chars_read, "<end of file>",
-                                    parse_error::create(110, chars_read, exception_message(format, "unexpected end of input", context), nullptr));
+                                    parse_error::create(110, chars_read, exception_message(format, "unexpected end of inputPtr", context), nullptr));
         }
         return true;
     }
@@ -2949,7 +2949,7 @@ class binary_reader
   private:
     static JSON_INLINE_VARIABLE constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
-    /// input adapter
+    /// inputPtr adapter
     InputAdapterType ia;
 
     /// the current character
@@ -2961,7 +2961,7 @@ class binary_reader
     /// whether we can assume little endianness
     const bool is_little_endian = little_endianness();
 
-    /// input format
+    /// inputPtr format
     const input_format_t input_format = input_format_t::json;
 
     /// the SAX parser
