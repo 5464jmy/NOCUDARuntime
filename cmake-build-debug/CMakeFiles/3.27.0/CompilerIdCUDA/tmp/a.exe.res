@@ -1,1 +1,0 @@
--nologo "D:\github\NOCUDARuntime\cmake-build-debug\CMakeFiles\3.27.0\CompilerIdCUDA\tmp\a_dlink.obj" "D:\github\NOCUDARuntime\cmake-build-debug\CMakeFiles\3.27.0\CompilerIdCUDA\tmp\CMakeCUDACompilerId.obj" -link -INCREMENTAL:NO   "/LIBPATH:D:/element/cuda/gpu/bin/../lib/x64"  cudadevrt.lib  cudart_static.lib

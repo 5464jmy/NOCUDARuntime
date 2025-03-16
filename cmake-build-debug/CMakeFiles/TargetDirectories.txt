@@ -1,8 +1,0 @@
-D:/github/NOCUDARuntime/cmake-build-debug/CMakeFiles/detect_dll.dir
-D:/github/NOCUDARuntime/cmake-build-debug/CMakeFiles/detect_dllStatic.dir
-D:/github/NOCUDARuntime/cmake-build-debug/CMakeFiles/NOCUDARuntime.dir
-D:/github/NOCUDARuntime/cmake-build-debug/CMakeFiles/MyExecutable.dir
-D:/github/NOCUDARuntime/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/github/NOCUDARuntime/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-D:/github/NOCUDARuntime/cmake-build-debug/pybind11/CMakeFiles/edit_cache.dir
-D:/github/NOCUDARuntime/cmake-build-debug/pybind11/CMakeFiles/rebuild_cache.dir

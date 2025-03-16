@@ -1,1 +1,0 @@
--D__CUDA_ARCH__=520 -nologo -c -TP  -DCUDA_DOUBLE_MATH_FUNCTIONS "-ID:/element/cuda/gpu/bin/../include"   -EHsc "D:\github\NOCUDARuntime\cmake-build-debug\CMakeFiles\3.27.0\CompilerIdCUDA\tmp\CMakeCUDACompilerId.cudafe1.cpp" 
